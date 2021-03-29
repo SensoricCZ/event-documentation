@@ -1,1 +1,1 @@
-# event-documentation
+# Events documentation
