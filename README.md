@@ -15,7 +15,7 @@ Do URL je možné vložit zástupné parametry, které budou nahrazeny odpovída
 
 Parametry pro sestavení URL:
 | Parametr          | Popis                         |
-| ------------------|-------------------------------|
+| :-----------------|:------------------------------|
 | ProtocolVersion   | verze komunikačního protokolu |
 | DeviceSerial      | sériové číslo senzoru         |
 | EventType         | typ události                  |
@@ -35,7 +35,7 @@ Do URL je možné vložit zástupné parametry, které budou nahrazeny odpovída
 
 Parametry pro sestavení URL:
 | Parametr          | Popis                         |
-| ------------------|-------------------------------|
+| :-----------------|:------------------------------|
 | ProtocolVersion   | verze komunikačního protokolu |
 | DeviceSerial      | sériové číslo senzoru         |
 | DeviceType        | typ zařízení                  |
@@ -69,7 +69,7 @@ Data jsou odesílána vždy jako samostatné události. Události mají společn
 
 Společné parametry:
 | Parametr          | Typ     | Popis                         |
-| ------------------|---------|-------------------------------|
+| :-----------------|:--------|:------------------------------|
 | ProtocolVersion   | integer | verze komunikačního protokolu |
 | DeviceSerial      | string  | sériové číslo senzoru         |
 | EventId           | string  | identifikátor události        |
@@ -78,21 +78,10 @@ Společné parametry:
 
 Datové události mají navíc parametr `DeviceType`:
 | Parametr          | Typ     | Popis                         |
-| ------------------|---------|-------------------------------|
+| :-----------------|:--------|:------------------------------|
 | DeviceType        | string  | typ zařízení                  |
 
 Další parametry jsou závislé na typu události.
-
-Možné hodnoty pro DeviceType:
-| DeviceType        | Zařízení                | Podporované typy zpráv        |
-| ------------------|-------------------------|-------------------------------|
-| unknown           | neznámé zařízené        | payload, data-volume-warning  |
-| thermo            | teploměr                | reset, test, measurement      |
-| humidity          | vlhkoměr                | reset, test, measurement      |
-| sos-button        | sos tlačítko            | reset, test, press            |
-| move              | pohybový senzor         | reset, test, ...              |
-| magnetic          | magnetický senzor       | reset, test, ...              |
-| pir               | pir senzor              | reset, test, ...              |
 
 ## 3.1 Systémové události
 Systémové události souvisí se zařízením, jsou společné pro všechna zařízení a vznikají nezávisle na dekódování dat přicházejících ze zařízení.
@@ -102,7 +91,7 @@ Jedná se o speciální typ události která vzniká pouze u zařízení nastave
 
 Parametry:
 | Parametr          | Typ     | Povinný | Popis
-| ------------------|---------|---------|------
+| :-----------------|:--------|:--------|:-----
 | Payload           | string  | ano     | obsah payloadu v hexadecimálním tvaru
 
 Ukázka zaslané události:
@@ -145,7 +134,7 @@ Nastává při odeslání naměřené hodnoty.
 
 Dodatečné předávané parametry:
 | Parametr          | Typ     | Povinný | Popis
-| ------------------|---------|---------|------
+| :-----------------|:--------|:--------|:-----
 | Temperature       | float   | ano     | naměřená teplota
 
 Ukázka zaslané události:
@@ -168,7 +157,7 @@ Zpráva *measured-lost* obsahuje odhadovaný čas kdy k vypadení zprávy došlo
 
 Dodatečné předávané parametry:
 | Parametr          | Typ     | Povinný | Popis
-| ------------------|---------|---------|------
+| :-----------------|:--------|:--------|:-----
 | LostValueTime     | string  | ano     | odhadovaný čas výpadku
 | LostValueType     | string  | ano     | upřesnění typu
 | Temperature       | float   | ano     | hodnota naměřené teploty
