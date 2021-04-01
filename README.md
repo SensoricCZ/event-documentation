@@ -1,11 +1,16 @@
-# Events documentation
-Dokument popis způsob předávání událostí ze systému SENSORIC do aplikace partnera.
+# Specifikace předávání událostí
+Dokument popisuje způsob předávání událostí ze systému SENSORIC do aplikace partnera.
 Způsob komunikace je mezi SENSORIC a partnerem dohodnut a na straně SENSORIC nastaven. V budoucnu bude umožněno partnerovi aby si sám nastavení měnil ve webovém rozhraní nebo přes API.
 ## 1 Způsoby předávání dat
 Data jsou předávána komunikačním protokolem ve formátu JSON a popisují události, které vznikají v systému SENSORIC. Položky datetime jsou v UTC podle ISO 8601. Pořadí parametrů není zaručeno a může se měnit.
 ## 2.1 Předávání událostí přes HTTP callback
-Partner může specifikovat jednu nebo vice URL na které jsou události zasílány formou HTTP(S) POST requestů. Requesty mají kódování UTF-8 a Content-Type “application/json”.
+Partner může specifikovat URL endpointů na které jsou události zasílány formou HTTP(S) POST requestů. Requesty mají kódování UTF-8 a Content-Type “application/json”.
 
+Partner může specifikovat URL pro dvě skupiny událostí:
+1) systémové události - souvisí se zařízením
+2) datové události - souvisí s dekódovanými daty ze zařízení
+
+### 2.1.1 URL endpointu pro systémové události
 Do URL je možné vložit zástupné parametry, které budou nahrazeny odpovídající hodnotou. 
 
 Parametry pro sestavení URL:
@@ -13,13 +18,32 @@ Parametry pro sestavení URL:
 | ------------------|-------------------------------|
 | ProtocolVersion   | verze komunikačního protokolu |
 | DeviceSerial      | sériové číslo senzoru         |
-| DeviceType        | typ zařízení *                |
 | EventType         | typ události                  |
 
-*Parametr `DeviceType` má hodnotu `unknown` v případě že typ zařízení není znám (týká se případu kdy je zařízení nastaveno tak že předává pouze raw data).
+Příklad URL (doporučené nastavení):
+
+`https://nejakaadresa.cz/event/v{ProtocolVersion}/{DeviceSerial}/{EventType}/`
+
+Pro uvedenou URL budou volány např. tyto requesty:
+
+https://nejakaadresa.cz/event/v1/abc123/battery-low/
+
+https://nejakaadresa.cz/event/v1/abc123/payload/
+
+### 2.1.2 URL endpointu pro datové události
+Do URL je možné vložit zástupné parametry, které budou nahrazeny odpovídající hodnotou. 
+
+Parametry pro sestavení URL:
+| Parametr          | Popis                         |
+| ------------------|-------------------------------|
+| ProtocolVersion   | verze komunikačního protokolu |
+| DeviceSerial      | sériové číslo senzoru         |
+| DeviceType        | typ zařízení                  |
+| EventType         | typ události                  |
 
 Příklad URL (doporučené nastavení):
-https://nejakaadresa.cz/event/v{ProtocolVersion}/{DeviceSerial}/DeviceType/{EventType}/
+
+`https://nejakaadresa.cz/event/v{ProtocolVersion}/{DeviceSerial}/{DeviceType}/{EventType}/`
 
 Pro uvedenou URL budou volány např. tyto requesty:
 
@@ -27,16 +51,18 @@ https://nejakaadresa.cz/event/v1/abc123/panic-button/pressed/
 
 https://nejakaadresa.cz/event/v1/abc123/thermometer/measured/
 
-https://nejakaadresa.cz/event/v1/abc123/movement/battery-low/
+### 2.1.3 Hlavičky HTTP requestu
+Partner může specifikovat další konfiguraci přidáním HTTP hlavičy (klíč a hodnota). Tím lze např. vyřešit autorizaci.
 
-https://nejakaadresa.cz/event/v1/abc123/unknown/payload/
+### 2.1.4 Odpověď na HTTP request
 
-Partner může specifikovat další konfiguraci přidáním HTTP hlaviček. Tím lze např. vyřešit autorizaci.
+Systém očekává v odpovědi HTTP status 200-299, kterým partner potvrdí přijetí události. Jiná odpověď je vyhodnocena jako nedoručení.
 
-Systém očekává v odpovědi HTTP status 200-299, kterým partner potvrdí přijetí události. Jiná odpověď je vyhodnocena jako nedoručení. V budoucnu bude řešena funkcionalita pro opakované odesílání nedoručených událostí.
+### 2.1.5 Chování v případě nedoručení události
+ V budoucnu bude řešena funkcionalita pro opakované odesílání nedoručených událostí. V současné verzi je nedoručená událost zahozena.
 
 ## 2.1 Předávání událostí přes MQTT
-TODO ...
+Bude upřesněno ...
 
 ## 3 Komunikační protokol
 Data jsou odesílána vždy jako samostatné události. Události mají společnou část parametrů.
@@ -46,12 +72,14 @@ Společné parametry:
 | ------------------|---------|-------------------------------|
 | ProtocolVersion   | integer | verze komunikačního protokolu |
 | DeviceSerial      | string  | sériové číslo senzoru         |
-| DeviceType        | string  | typ zařízení *                |
 | EventId           | string  | identifikátor události        |
 | EventTime         | string  | čas události                  |
 | EventType         | string  | typ události                  |
 
-*Parametr `DeviceType` má hodnotu `unknown` v případě že typ zařízení není znám (týká se případu kdy je zařízení nastaveno tak že předává pouze raw data).
+Datové události mají navíc parametr `DeviceType`:
+| Parametr          | Typ     | Popis                         |
+| ------------------|---------|-------------------------------|
+| DeviceType        | string  | typ zařízení                  |
 
 Další parametry jsou závislé na typu události.
 
@@ -66,14 +94,59 @@ Možné hodnoty pro DeviceType:
 | magnetic          | magnetický senzor       | reset, test, ...              |
 | pir               | pir senzor              | reset, test, ...              |
 
+## 3.1 Systémové události
+Systémové události souvisí se zařízením, jsou společné pro všechna zařízení a vznikají nezávisle na dekódování dat přicházejících ze zařízení.
 
-## 3.x Událost measured
-Nastává při odeslání naměřené hodnoty teploměrem.
+### 3.1.1 Událost payload
+Jedná se o speciální typ události která vzniká pouze u zařízení nastavených do režimu "raw komunikace", u kterých neprobíhá dekódování payloadu příchozích zpráv, ale data se partnerovi předávají v původní nezpracované podobě. Tato zařízení neposílají datové události (neprobíhá dekódování payloadu).
+
+Parametry:
+| Parametr          | Typ     | Povinný | Popis
+| ------------------|---------|---------|------
+| Payload           | string  | ano     | obsah payloadu v hexadecimálním tvaru
+
+Ukázka zaslané události:
+```json
+{
+    "ProtocolVersion": 1,
+    "DeviceSerial": "abc123",
+    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
+    "EventTime": "2021-05-03T14:25:31.8437511Z",
+    "EventType": "payload",
+    "Payload": "00aa11bb"
+}
+```
+
+### 3.1.1 Událost activation
+Informuje o úspěšné aktivaci senzoru v systému.
+Bude upřesněno ...
+
+### 3.1.1 Událost disable
+Informuje o zastavení komunikace ze zařízení.
+Bude upřesněno ...
+
+### 3.1.2 Událost battery-warning
+Nastává při vyhodnocení nízkého stavu baterie.
+Bude upřesněno ...
+
+### 3.1.3 Událost data-warning
+Upozornění na vysoký objem přenesených dat.
+Bude upřesněno ...
+
+### 3.1.3 Událost communication-warning
+Upozornění na nestandardní chování zařízení.
+Bude upřesněno ...
+
+## 3.1 Datové události pro teploměr (DeviceType = thermo)
+Události pro teploměr.
+
+## 3.1.1 Událost measured
+Nastává při odeslání naměřené hodnoty.
 
 Dodatečné předávané parametry:
 | Parametr          | Typ     | Povinný | Popis
 | ------------------|---------|---------|------
-| Temperature       | float   | ano     | Namšřená teplota
+| Temperature       | float   | ano     | naměřená teplota
 
 Ukázka zaslané události:
 ```json
@@ -88,13 +161,19 @@ Ukázka zaslané události:
 }
 ```
 
-## 3.x Událost battery-level-warning
-Nastává při vyhodnocení nízkého stavu baterie.
+## 3.1.1 Událost measured-lost
+Při příchodu zpráv z teploměru probíhá kontrola, zda před aktuální datovou zprávou nedošlo k výpadku. Pokud je detekován výpadek, systém vygeneruje událost *measured-lost* (jednu nebo více) a následně odešle i aktuální zprávu událostí *measured*.
+
+Zpráva *measured-lost* obsahuje odhadovaný čas kdy k vypadení zprávy došlo a hodnotu s upřesněním typu detekce.
 
 Dodatečné předávané parametry:
 | Parametr          | Typ     | Povinný | Popis
 | ------------------|---------|---------|------
-| Level             | integer | ano     | procentuální stav baterie
+| LostValueTime     | string  | ano     | odhadovaný čas výpadku
+| LostValueType     | string  | ano     | upřesnění typu
+| Temperature       | float   | ano     | hodnota naměřené teploty
+
+LostValueType informuje o tom zda byla zpráva rekonstruována (LostValueType = recovered) a hodnota je tedy přesná, nebo se hodnotu nepodařilo rekonstruovat (LostValueType = unknown) a v tom případě parametr Temperature obsahuje poslední známou hodnotu. 
 
 Ukázka zaslané události:
 ```json
@@ -104,28 +183,9 @@ Ukázka zaslané události:
     "DeviceType": "thermo",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "battery-level-warning",
-    "Level": 30
-}
-```
-
-## 3.x Událost payload
-Nastává při příchodu zprávy u zařízení která jsou nastavena na předávání nezpracovaného payloadu (u těchto zařízení neprobíhá dekódování obsahu payloadu).
-
-Dodatečné předávané parametry:
-| Parametr          | Typ     | Povinný | Popis
-| ------------------|---------|---------|------
-| Payload           | string  | ano     | obsah payloadu v hexadecimálním tvaru
-
-Ukázka zaslané události:
-```json
-{
-    "ProtocolVersion": 1,
-    "DeviceSerial": "abc123",
-    "DeviceType": "unknown",
-    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
-    "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "payload",
-    "Payload": "00aa11bb"
+    "EventType": "measured-lost",
+    "LostValueTime": "2021-05-03T14:20:31.8437511Z",
+    "LostValueType": "recovered",
+    "Temperature": 25.5
 }
 ```
