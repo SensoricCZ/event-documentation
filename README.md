@@ -26,9 +26,9 @@ Příklad URL (doporučené nastavení):
 
 Pro uvedenou URL budou volány např. tyto requesty:
 
-https://nejakaadresa.cz/event/v1/abc123/battery-low/
+https://nejakaadresa.cz/event/v1/abc123/reset/
 
-https://nejakaadresa.cz/event/v1/abc123/payload/
+https://nejakaadresa.cz/event/v1/abc123/battery-warning/
 
 ### 2.1.2 URL endpointu pro datové události
 Do URL je možné vložit zástupné parametry, které budou nahrazeny odpovídající hodnotou. 
@@ -86,7 +86,7 @@ Další parametry jsou závislé na typu události.
 ## 3.1 Systémové události
 Systémové události souvisí se zařízením, jsou společné pro všechna zařízení a vznikají nezávisle na dekódování dat přicházejících ze zařízení.
 
-### 3.1.1 Událost payload
+### 3.1.1 Událost 'payload'
 Jedná se o speciální typ události která vzniká pouze u zařízení nastavených do režimu "raw komunikace", u kterých neprobíhá dekódování payloadu příchozích zpráv, ale data se partnerovi předávají v původní nezpracované podobě. Tato zařízení neposílají datové události (neprobíhá dekódování payloadu).
 
 Parametry:
@@ -95,7 +95,7 @@ Parametry:
 | Payload           | string  | ano     | obsah payloadu v hexadecimálním tvaru
 
 Ukázka zaslané události:
-```json
+```yaml
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
@@ -106,30 +106,50 @@ Ukázka zaslané události:
 }
 ```
 
-### 3.1.1 Událost activation
+### 3.1.1 Událost 'activation'
 Informuje o úspěšné aktivaci senzoru v systému.
 Bude upřesněno ...
 
-### 3.1.1 Událost disable
+### 3.1.1 Událost 'disable'
 Informuje o zastavení komunikace ze zařízení.
 Bude upřesněno ...
 
-### 3.1.2 Událost battery-warning
+### 3.1.2 Událost 'battery-warning'
 Nastává při vyhodnocení nízkého stavu baterie.
 Bude upřesněno ...
 
-### 3.1.3 Událost data-warning
+### 3.1.3 Událost 'data-warning'
 Upozornění na vysoký objem přenesených dat.
 Bude upřesněno ...
 
-### 3.1.3 Událost communication-warning
+### 3.1.3 Událost 'communication-warning'
 Upozornění na nestandardní chování zařízení.
 Bude upřesněno ...
 
-## 3.1 Datové události pro teploměr (DeviceType = thermo)
+## 3.1 Společné datové události
+Události vzniklé na základě příchozích zpráv společné pro více typů zařízení. U každého typu je upřesněno které ze společných událostí u něj mohou nastat.
+
+## 3.1.1 Událost 'reset'
+Nastává při resetu senzoru.
+Bude upřesněno ...
+
+## 3.1.2 Událost 'test'
+Nastává při příjmu testovací zprávy ze senzoru.
+Bude upřesněno ...
+
+## 3.1.3 Událost 'alive'
+Nastává při příjmu alive zprávy ze senzoru.
+Bude upřesněno ...
+
+## 3.2 Datové události pro zařízení 'thermo'
 Události pro teploměr.
 
-## 3.1.1 Událost measured
+### Společné datové události
+Kromě datových zpráv specifických pro tento senzor mohou nastat tyto společné události:
+
+*reset*, *test*, *alive*.
+
+## 3.2.1 Událost 'measured'
 Nastává při odeslání naměřené hodnoty.
 
 Dodatečné předávané parametry:
@@ -138,7 +158,7 @@ Dodatečné předávané parametry:
 | Temperature       | float   | ano     | naměřená teplota
 
 Ukázka zaslané události:
-```json
+```yaml
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
@@ -150,10 +170,10 @@ Ukázka zaslané události:
 }
 ```
 
-## 3.1.1 Událost measured-lost
-Při příchodu zpráv z teploměru probíhá kontrola, zda před aktuální datovou zprávou nedošlo k výpadku. Pokud je detekován výpadek, systém vygeneruje událost *measured-lost* (jednu nebo více) a následně odešle i aktuální zprávu událostí *measured*.
+## 3.2.1 Událost measured-lost
+Při příchodu zpráv z teploměru probíhá kontrola, zda před aktuální datovou zprávou nedošlo k výpadku. Pokud je detekován výpadek, systém vygeneruje událost *measured-lost* (jednu nebo více) a následně odešle i aktuální událost *measured*.
 
-Zpráva *measured-lost* obsahuje odhadovaný čas kdy k vypadení zprávy došlo a hodnotu s upřesněním typu detekce.
+Zpráva *measured-lost* obsahuje odhadovaný čas kdy k vypadení zprávy došlo, upřesnění typu detekce a hodnotu.
 
 Dodatečné předávané parametry:
 | Parametr          | Typ     | Povinný | Popis
@@ -162,10 +182,10 @@ Dodatečné předávané parametry:
 | LostValueType     | string  | ano     | upřesnění typu
 | Temperature       | float   | ano     | hodnota naměřené teploty
 
-LostValueType informuje o tom zda byla zpráva rekonstruována (LostValueType = recovered) a hodnota je tedy přesná, nebo se hodnotu nepodařilo rekonstruovat (LostValueType = unknown) a v tom případě parametr Temperature obsahuje poslední známou hodnotu. 
+*LostValueType* informuje o tom, zda byla zpráva rekonstruována (*LostValueType: recovered*) a hodnota *Temperature* je tedy přesná, nebo byla dopočítána (*LostValueType: calculated*). 
 
 Ukázka zaslané události:
-```json
+```yaml
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
