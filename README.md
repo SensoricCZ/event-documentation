@@ -26,9 +26,9 @@ Příklad URL (doporučené nastavení):
 
 Pro uvedenou URL budou volány např. tyto requesty:
 
-https://nejakaadresa.cz/event/v1/abc123/reset/
+https://nejakaadresa.cz/event/v1/abc123/Reset/
 
-https://nejakaadresa.cz/event/v1/abc123/battery-warning/
+https://nejakaadresa.cz/event/v1/abc123/BatteryWarning/
 
 ### 1.1.2 URL endpointu pro datové události
 Do URL je možné vložit zástupné parametry, které budou nahrazeny odpovídající hodnotou. 
@@ -47,9 +47,9 @@ Příklad URL (doporučené nastavení):
 
 Pro uvedenou URL budou volány např. tyto requesty:
 
-https://nejakaadresa.cz/event/v1/abc123/panic-button/pressed/
+https://nejakaadresa.cz/event/v1/abc123/PanicButton/Pressed/
 
-https://nejakaadresa.cz/event/v1/abc123/thermometer/measured/
+https://nejakaadresa.cz/event/v1/abc123/Thermometer/Measured/
 
 ### 1.1.3 Hlavičky HTTP requestu
 Partner může specifikovat další konfiguraci přidáním HTTP hlavičy (klíč a hodnota). Tím lze např. vyřešit autorizaci.
@@ -86,7 +86,7 @@ Další parametry jsou závislé na typu události.
 ## 2.1 Systémové události
 Systémové události souvisí se zařízením, jsou společné pro všechna zařízení a vznikají nezávisle na dekódování dat přicházejících ze zařízení.
 
-### 2.1.1 Událost 'payload'
+### 2.1.1 Událost 'Payload'
 Jedná se o speciální typ události která vzniká pouze u zařízení nastavených do režimu "raw komunikace", u kterých neprobíhá dekódování payloadu příchozích zpráv, ale data se partnerovi předávají v původní nezpracované podobě. Tato zařízení neposílají datové události (neprobíhá dekódování payloadu).
 
 Parametry:
@@ -101,19 +101,19 @@ Ukázka zaslané události:
     "DeviceSerial": "abc123",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "payload",
+    "EventType": "Payload",
     "Payload": "00aa11bb"
 }
 ```
 
-### 2.1.2 Událost 'activation'
+### 2.1.2 Událost 'Activation'
 Informuje o úspěšné aktivaci senzoru v systému.
 Bude upřesněno ...
 
 ## 2.2 Společné datové události
 Události vzniklé na základě příchozích zpráv společné pro více typů zařízení. U každého typu je upřesněno které ze společných událostí u něj mohou nastat.
 
-## 2.2.1 Událost 'reset'
+## 2.2.1 Událost 'Reset'
 Nastává při resetu senzoru.
 
 Ukázka zaslané události:
@@ -121,14 +121,14 @@ Ukázka zaslané události:
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
-    "DeviceType": "water",
+    "DeviceType": "Water",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "reset"
+    "EventType": "Reset"
 }
 ```
 
-## 2.2.2 Událost 'test'
+## 2.2.2 Událost 'Test'
 Nastává při příjmu testovací zprávy ze senzoru. Testovací zpráva souvisí s procesem aktivace a standardně není partnerům předávána.
 
 Ukázka zaslané události:
@@ -136,14 +136,14 @@ Ukázka zaslané události:
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
-    "DeviceType": "water",
+    "DeviceType": "Water",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "test"
+    "EventType": "Test"
 }
 ```
 
-## 2.2.3 Událost 'alive'
+## 2.2.3 Událost 'Alive'
 Nastává při příjmu ohlašovací zprávy ze senzoru. Ohlašovací zpráva informuje o tom, že zařízení žije a odesílá se v pravidelném intervalu od odeslání poslední zprávy.
 
 Ukázka zaslané události:
@@ -151,14 +151,14 @@ Ukázka zaslané události:
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
-    "DeviceType": "water",
+    "DeviceType": "Water",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "alive"
+    "EventType": "Alive"
 }
 ```
 
-## 2.2.4 Událost 'alert-start'
+## 2.2.4 Událost 'AlertStart'
 Nastává při poplachovém stavu na senzoru.
 
 Ukázka zaslané události:
@@ -166,14 +166,14 @@ Ukázka zaslané události:
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
-    "DeviceType": "move",
+    "DeviceType": "Move",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "alert-start"
+    "EventType": "AlertStart"
 }
 ```
 
-## 2.2.5 Událost 'alert-continue'
+## 2.2.5 Událost 'AlertContinue'
 Nastává při reportu pokračování poplachovém ze senzoru.
 
 Ukázka zaslané události:
@@ -181,14 +181,14 @@ Ukázka zaslané události:
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
-    "DeviceType": "move",
+    "DeviceType": "Move",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "alert-continue"
+    "EventType": "AlertContinue"
 }
 ```
 
-## 2.2.6 Událost 'alert-end'
+## 2.2.6 Událost 'AlertEnd'
 Nastává při ukončení poplachového stavu na senzoru.
 
 Ukázka zaslané události:
@@ -196,14 +196,14 @@ Ukázka zaslané události:
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
-    "DeviceType": "move",
+    "DeviceType": "Move",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "alert-end"
+    "EventType": "AlertEnd"
 }
 ```
 
-## 2.2.7 Událost 'tamper-open'
+## 2.2.7 Událost 'TamperOpen'
 Nastává při rozepnutí tamperu - otevření krytu senzoru.
 
 Ukázka zaslané události:
@@ -211,14 +211,14 @@ Ukázka zaslané události:
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
-    "DeviceType": "move",
+    "DeviceType": "Move",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "tamper-open"
+    "EventType": "TamperOpen"
 }
 ```
 
-## 2.2.8 Událost 'tamper-closed'
+## 2.2.8 Událost 'TamperClosed'
 Nastává při sepnutí tamperu - zavření krytu senzoru.
 
 Ukázka zaslané události:
@@ -226,14 +226,14 @@ Ukázka zaslané události:
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
-    "DeviceType": "move",
+    "DeviceType": "Move",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "tamper-closed"
+    "EventType": "TamperClosed"
 }
 ```
 
-## 2.2.9 Událost 'free-fall'
+## 2.2.9 Událost 'FreeFall'
 Nastává při detekci volného pádu senzoru.
 
 Ukázka zaslané události:
@@ -241,68 +241,68 @@ Ukázka zaslané události:
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
-    "DeviceType": "moto",
+    "DeviceType": "Moto",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "free-fall"
+    "EventType": "FreeFall"
 }
 ```
 
-## 2.3 Datové události pro zařízení 'water'
+## 2.3 Datové události pro zařízení 'Water'
 Události pro vodní/záplavový senzor.
 
 ### Společné datové události
-- reset
-- alive
-- alert-start   *... začátek zaplavení*
-- alert-continue   *... zaplavení pokračuje*
-- alert-end   *... konec zaplavení*
+- Reset
+- Alive
+- AlertStart   *... začátek zaplavení*
+- AlertContinue   *... zaplavení pokračuje*
+- AlertEnd   *... konec zaplavení*
 
-## 2.4 Datové události pro zařízení 'move'
+## 2.4 Datové události pro zařízení 'Move'
 Události pro pohybový senzor.
 
 ### Společné datové události
-- reset
-- alive
-- alert-start   *... začátek pohybu*
-- alert-continue   *... pohyb pokračuje*
-- alert-end   *... konec pohybu*
-- tamper-open
-- tamper-closed
+- Reset
+- Alive
+- AlertDtart   *... začátek pohybu*
+- AlertContinue   *... pohyb pokračuje*
+- AlertEnd   *... konec pohybu*
+- TamperOpen
+- TamperClosed
 
-## 2.5 Datové události pro zařízení 'pir'
+## 2.5 Datové události pro zařízení 'Pir'
 Události pro PIR senzor.
 
 ### Společné datové události
-- reset
-- alive
-- alert-start   *... začátek pohybu*
-- alert-continue   *... pohyb pokračuje*
-- alert-end   *... konec pohybu*
-- tamper-open
-- tamper-closed
+- Reset
+- Alive
+- AlertStart   *... začátek pohybu*
+- AlertContinue   *... pohyb pokračuje*
+- AlertEnd   *... konec pohybu*
+- TamperOpen
+- TamperClosed
 
-## 2.6 Datové události pro zařízení 'magnet'
+## 2.6 Datové události pro zařízení 'Magnet'
 Události pro magnetický senzor.
 
 ### Společné datové události
-- reset
-- alive
-- alert-start   *... význam zavisí na režimu senzoru*
-- alert-continue   *... význam a to zda událost může nastat zavisí na režimu senzoru*
-- alert-end   *... význam zavisí na režimu senzoru*
-- tamper-open
-- tamper-closed
+- Reset
+- Alive
+- AlertStart   *... význam zavisí na režimu senzoru*
+- AlertContinue   *... význam a to zda událost může nastat zavisí na režimu senzoru*
+- AlertEnd   *... význam zavisí na režimu senzoru*
+- TamperOpen
+- TamperClosed
 
-## 2.7 Datové události pro zařízení 'thermo'
+## 2.7 Datové události pro zařízení 'Thermo'
 Události pro teploměr.
 
 ### Společné datové události
 Kromě datových zpráv specifických pro tento senzor mohou nastat tyto společné události:
-- reset
-- alive
+- Reset
+- Alive
 
-## 2.7.1 Událost 'measured'
+## 2.7.1 Událost 'Measured'
 Nastává při odeslání naměřené hodnoty.
 
 Dodatečné předávané parametry:
@@ -315,20 +315,20 @@ Ukázka zaslané události:
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
-    "DeviceType": "thermo",
+    "DeviceType": "Thermo",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "measured",
+    "EventType": "Measured",
     "Temperature": 25.5
 }
 ```
 
-## 2.7.2 Událost measured-lost *
+## 2.7.2 Událost MeasuredLost *
 **\* Zpráva v současnosti není implementována.**
 
-Při příchodu zpráv z teploměru probíhá kontrola, zda před aktuální datovou zprávou nedošlo k výpadku. Pokud je detekován výpadek, systém vygeneruje událost *measured-lost* (jednu nebo více) a následně odešle i aktuální událost *measured*.
+Při příchodu zpráv z teploměru probíhá kontrola, zda před aktuální datovou zprávou nedošlo k výpadku. Pokud je detekován výpadek, systém vygeneruje událost *MeasuredLost* (jednu nebo více) a následně odešle i aktuální událost *Measured*.
 
-Zpráva *measured-lost* obsahuje odhadovaný čas kdy k vypadení zprávy došlo, upřesnění typu detekce a hodnotu.
+Zpráva *MeasuredLost* obsahuje odhadovaný čas kdy k vypadení zprávy došlo, upřesnění typu detekce a hodnotu.
 
 Dodatečné předávané parametry:
 | Parametr          | Typ     | Povinný | Popis
@@ -337,32 +337,32 @@ Dodatečné předávané parametry:
 | LostValueType     | string  | ano     | upřesnění typu
 | Temperature       | float   | ano     | hodnota teploty
 
-*LostValueType* informuje o tom, zda byla zpráva rekonstruována (*LostValueType: recovered*) a hodnota *Temperature* je tedy přesná, nebo byla dopočítána (*LostValueType: calculated*). 
+*LostValueType* informuje o tom, zda byla zpráva rekonstruována (*LostValueType: Recovered*) a hodnota *Temperature* je tedy přesná, nebo byla dopočítána (*LostValueType: Calculated*). 
 
 Ukázka zaslané události:
 ```yaml
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
-    "DeviceType": "thermo",
+    "DeviceType": "Thermo",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "measured-lost",
+    "EventType": "MeasuredLost",
     "LostValueTime": "2021-05-03T14:20:31.8437511Z",
-    "LostValueType": "recovered",
+    "LostValueType": "Recovered",
     "Temperature": 25.5
 }
 ```
 
-## 2.8 Datové události pro zařízení 'humidity'
+## 2.8 Datové události pro zařízení 'Humidity'
 Události pro vlhkoměr.
 
 ### Společné datové události
 Kromě datových zpráv specifických pro tento senzor mohou nastat tyto společné události:
-- reset
-- alive
+- Reset
+- Alive
 
-## 2.8.1 Událost 'measured'
+## 2.8.1 Událost 'Measured'
 Nastává při odeslání naměřené hodnoty.
 
 Dodatečné předávané parametry:
@@ -376,21 +376,21 @@ Ukázka zaslané události:
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
-    "DeviceType": "humidity",
+    "DeviceType": "Humidity",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "measured",
+    "EventType": "Measured",
     "Temperature": 25.5,
     "Humidity": 27.5
 }
 ```
 
-## 2.8.2 Událost measured-lost *
+## 2.8.2 Událost MeasuredLost *
 **\* Zpráva v současnosti není implementována.**
 
-Při příchodu zpráv z vlhkoměru probíhá kontrola, zda před aktuální datovou zprávou nedošlo k výpadku. Pokud je detekován výpadek, systém vygeneruje událost *measured-lost* (jednu nebo více) a následně odešle i aktuální událost *measured*.
+Při příchodu zpráv z vlhkoměru probíhá kontrola, zda před aktuální datovou zprávou nedošlo k výpadku. Pokud je detekován výpadek, systém vygeneruje událost *MeasuredLost* (jednu nebo více) a následně odešle i aktuální událost *Measured*.
 
-Zpráva *measured-lost* obsahuje odhadovaný čas kdy k vypadení zprávy došlo, upřesnění typu detekce a hodnoty.
+Zpráva *MeasuredLost* obsahuje odhadovaný čas kdy k vypadení zprávy došlo, upřesnění typu detekce a hodnoty.
 
 Dodatečné předávané parametry:
 | Parametr          | Typ     | Povinný | Popis
@@ -400,19 +400,19 @@ Dodatečné předávané parametry:
 | Temperature       | float   | ano     | hodnota teploty
 | Humidity          | float   | ano     | hodnota vlhkosti
 
-*LostValueType* informuje o tom, zda byla zpráva rekonstruována (*LostValueType: recovered*) a hodnota *Temperature* je tedy přesná, nebo byla dopočítána (*LostValueType: calculated*). 
+*LostValueType* informuje o tom, zda byla zpráva rekonstruována (*LostValueType: Recovered*) a hodnota *Temperature* je tedy přesná, nebo byla dopočítána (*LostValueType: Calculated*). 
 
 Ukázka zaslané události:
 ```yaml
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
-    "DeviceType": "humidity",
+    "DeviceType": "Humidity",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "measured-lost",
+    "EventType": "MeasuredLost",
     "LostValueTime": "2021-05-03T14:20:31.8437511Z",
-    "LostValueType": "recovered",
+    "LostValueType": "Recovered",
     "Temperature": 25.5,
     "Humidity": 27.5
 }
