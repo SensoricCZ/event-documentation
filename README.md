@@ -248,7 +248,7 @@ Ukázka zaslané události:
 }
 ```
 
-## 2.3 Datové události pro zařízení 'Water'
+## 2.3 Datové události pro zařízení 'WaterDetection'
 Události pro vodní/záplavový senzor.
 
 ### Společné datové události
@@ -258,13 +258,13 @@ Události pro vodní/záplavový senzor.
 - AlertContinue   *... zaplavení pokračuje*
 - AlertEnd   *... konec zaplavení*
 
-## 2.4 Datové události pro zařízení 'Move'
+## 2.4 Datové události pro zařízení 'MovementDetection'
 Události pro pohybový senzor.
 
 ### Společné datové události
 - Reset
 - Alive
-- AlertDtart   *... začátek pohybu*
+- AlertStart   *... začátek pohybu*
 - AlertContinue   *... pohyb pokračuje*
 - AlertEnd   *... konec pohybu*
 - TamperOpen
@@ -282,7 +282,7 @@ Události pro PIR senzor.
 - TamperOpen
 - TamperClosed
 
-## 2.6 Datové události pro zařízení 'Magnet'
+## 2.6 Datové události pro zařízení 'Magnetic'
 Události pro magnetický senzor.
 
 ### Společné datové události
@@ -294,7 +294,15 @@ Události pro magnetický senzor.
 - TamperOpen
 - TamperClosed
 
-## 2.7 Datové události pro zařízení 'Thermo'
+## 2.7 Datové události pro zařízení 'AlertButton'
+Události pro panic tlačítko.
+
+### Společné datové události
+- Reset
+- Alive
+- AlertStart   *... stisknutí tlačítka*
+
+## 2.8 Datové události pro zařízení 'ThermoMeter'
 Události pro teploměr.
 
 ### Společné datové události
@@ -302,7 +310,7 @@ Kromě datových zpráv specifických pro tento senzor mohou nastat tyto společ
 - Reset
 - Alive
 
-## 2.7.1 Událost 'Measured'
+## 2.8.1 Událost 'Measured'
 Nastává při odeslání naměřené hodnoty.
 
 Dodatečné předávané parametry:
@@ -315,7 +323,7 @@ Ukázka zaslané události:
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
-    "DeviceType": "Thermo",
+    "DeviceType": "ThermoMeter",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
     "EventType": "Measured",
@@ -323,7 +331,7 @@ Ukázka zaslané události:
 }
 ```
 
-## 2.7.2 Událost MeasuredLost *
+## 2.8.2 Událost MeasuredLost *
 **\* Zpráva v současnosti není implementována.**
 
 Při příchodu zpráv z teploměru probíhá kontrola, zda před aktuální datovou zprávou nedošlo k výpadku. Pokud je detekován výpadek, systém vygeneruje událost *MeasuredLost* (jednu nebo více) a následně odešle i aktuální událost *Measured*.
@@ -344,7 +352,7 @@ Ukázka zaslané události:
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
-    "DeviceType": "Thermo",
+    "DeviceType": "ThermoMeter",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
     "EventType": "MeasuredLost",
@@ -354,7 +362,7 @@ Ukázka zaslané události:
 }
 ```
 
-## 2.8 Datové události pro zařízení 'Humidity'
+## 2.9 Datové události pro zařízení 'HumidityMeter'
 Události pro vlhkoměr.
 
 ### Společné datové události
@@ -362,7 +370,7 @@ Kromě datových zpráv specifických pro tento senzor mohou nastat tyto společ
 - Reset
 - Alive
 
-## 2.8.1 Událost 'Measured'
+## 2.9.1 Událost 'Measured'
 Nastává při odeslání naměřené hodnoty.
 
 Dodatečné předávané parametry:
@@ -376,7 +384,7 @@ Ukázka zaslané události:
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
-    "DeviceType": "Humidity",
+    "DeviceType": "HumidityMeter",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
     "EventType": "Measured",
@@ -385,7 +393,7 @@ Ukázka zaslané události:
 }
 ```
 
-## 2.8.2 Událost MeasuredLost *
+## 2.9.2 Událost MeasuredLost *
 **\* Zpráva v současnosti není implementována.**
 
 Při příchodu zpráv z vlhkoměru probíhá kontrola, zda před aktuální datovou zprávou nedošlo k výpadku. Pokud je detekován výpadek, systém vygeneruje událost *MeasuredLost* (jednu nebo více) a následně odešle i aktuální událost *Measured*.
@@ -407,7 +415,7 @@ Ukázka zaslané události:
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
-    "DeviceType": "Humidity",
+    "DeviceType": "HumidityMeter",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
     "EventType": "MeasuredLost",
