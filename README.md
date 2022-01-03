@@ -302,7 +302,7 @@ Události pro panic tlačítko.
 - Alive
 - AlertStart   *... stisknutí tlačítka*
 
-## 2.8 Datové události pro zařízení 'ThermoMeter'
+## 2.8 Datové události pro zařízení 'Thermometer'
 Události pro teploměr.
 
 ### Společné datové události
@@ -323,7 +323,7 @@ Ukázka zaslané události:
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
-    "DeviceType": "ThermoMeter",
+    "DeviceType": "Thermometer",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
     "EventType": "Measured",
@@ -352,7 +352,7 @@ Ukázka zaslané události:
 {
     "ProtocolVersion": 1,
     "DeviceSerial": "abc123",
-    "DeviceType": "ThermoMeter",
+    "DeviceType": "Thermometer",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
     "EventType": "MeasuredLost",
