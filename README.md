@@ -128,8 +128,8 @@ Ukázka zaslané události:
 }
 ```
 
-## 2.2.2 Událost 'Test'
-Nastává při příjmu testovací zprávy ze senzoru. Testovací zpráva souvisí s procesem aktivace a standardně není partnerům předávána.
+## 2.2.2 Událost 'Transport'
+Nastává při přechodu senzoru do transportního režimu.
 
 Ukázka zaslané události:
 ```yaml
@@ -139,7 +139,7 @@ Ukázka zaslané události:
     "DeviceType": "Water",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "Test"
+    "EventType": "Transport"
 }
 ```
 
