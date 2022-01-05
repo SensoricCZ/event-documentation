@@ -26,7 +26,7 @@ Příklad URL (doporučené nastavení):
 
 Pro uvedenou URL budou volány např. tyto requesty:
 
-https://nejakaadresa.cz/event/v1/abc123/Reset/
+https://nejakaadresa.cz/event/v1/abc123/Restart/
 
 https://nejakaadresa.cz/event/v1/abc123/BatteryWarning/
 
@@ -113,8 +113,8 @@ Bude upřesněno ...
 ## 2.2 Společné datové události
 Události vzniklé na základě příchozích zpráv společné pro více typů zařízení. U každého typu je upřesněno které ze společných událostí u něj mohou nastat.
 
-## 2.2.1 Událost 'Reset'
-Nastává při resetu senzoru.
+## 2.2.1 Událost 'Restart'
+Nastává při restartu senzoru.
 
 Ukázka zaslané události:
 ```yaml
@@ -124,7 +124,7 @@ Ukázka zaslané události:
     "DeviceType": "Water",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "Reset"
+    "EventType": "Restart"
 }
 ```
 
@@ -252,7 +252,7 @@ Ukázka zaslané události:
 Události pro vodní/záplavový senzor.
 
 ### Společné datové události
-- Reset
+- Restart
 - Alive
 - AlertStart   *... začátek zaplavení*
 - AlertContinue   *... zaplavení pokračuje*
@@ -262,7 +262,7 @@ Události pro vodní/záplavový senzor.
 Události pro pohybový senzor.
 
 ### Společné datové události
-- Reset
+- Restart
 - Alive
 - AlertStart   *... začátek pohybu*
 - AlertContinue   *... pohyb pokračuje*
@@ -274,7 +274,7 @@ Události pro pohybový senzor.
 Události pro PIR senzor.
 
 ### Společné datové události
-- Reset
+- Restart
 - Alive
 - AlertStart   *... začátek pohybu*
 - AlertContinue   *... pohyb pokračuje*
@@ -286,7 +286,7 @@ Události pro PIR senzor.
 Události pro magnetický senzor.
 
 ### Společné datové události
-- Reset
+- Restart
 - Alive
 - AlertStart   *... význam zavisí na režimu senzoru*
 - AlertContinue   *... význam a to zda událost může nastat zavisí na režimu senzoru*
@@ -298,7 +298,7 @@ Události pro magnetický senzor.
 Události pro panic tlačítko.
 
 ### Společné datové události
-- Reset
+- Restart
 - Alive
 - AlertStart   *... stisknutí tlačítka*
 
@@ -307,7 +307,7 @@ Události pro teploměr.
 
 ### Společné datové události
 Kromě datových zpráv specifických pro tento senzor mohou nastat tyto společné události:
-- Reset
+- Restart
 - Alive
 
 ## 2.8.1 Událost 'Measured'
@@ -367,7 +367,7 @@ Události pro vlhkoměr.
 
 ### Společné datové události
 Kromě datových zpráv specifických pro tento senzor mohou nastat tyto společné události:
-- Reset
+- Restart
 - Alive
 
 ## 2.9.1 Událost 'Measured'
