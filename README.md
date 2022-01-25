@@ -1,316 +1,273 @@
 # Specifikace předávání událostí
 Dokument popisuje způsob předávání událostí ze systému SENSORIC do aplikace partnera.
-Způsob komunikace je mezi SENSORIC a partnerem dohodnut a na straně SENSORIC nastaven. V budoucnu bude umožněno partnerovi aby si sám nastavení měnil ve webovém rozhraní nebo přes API.
-## 1 Způsoby předávání dat
+
+**Způsob komunikace je mezi SENSORIC a partnerem dohodnut a na straně SENSORIC nastaven.** V budoucnu bude umožněno partnerovi aby si sám nastavení měnil ve webovém rozhraní nebo přes API.
+
+## Obsah
+- [Specifikace předávání událostí](#specifikace-předávání-událostí)
+  - [Obsah](#obsah)
+- [Způsoby předávání dat](#způsoby-předávání-dat)
+  - [Předávání událostí přes HTTP callback](#předávání-událostí-přes-http-callback)
+    - [URL HTTP requestu](#url-http-requestu)
+    - [Hlavičky HTTP requestu](#hlavičky-http-requestu)
+    - [Odpověď na HTTP request](#odpověď-na-http-request)
+    - [Chování v případě nedoručení události](#chování-v-případě-nedoručení-události)
+- [Komunikační protokol](#komunikační-protokol)
+- [Zařízení a podporované události](#zařízení-a-podporované-události)
+  - [Zařízení WaterDetection](#zařízení-waterdetection)
+    - [Režim Continuous](#režim-continuous)
+  - [Zařízení Move](#zařízení-move)
+    - [Režim Continuous](#režim-continuous-1)
+  - [Zařízení Magnetic](#zařízení-magnetic)
+    - [Režim Simple](#režim-simple)
+    - [Režim Continuous](#režim-continuous-2)
+  - [Zařízení Pir](#zařízení-pir)
+    - [Režim Simple](#režim-simple-1)
+    - [Režim Continuous](#režim-continuous-3)
+  - [Zařízení AlertButton](#zařízení-alertbutton)
+    - [Režim Simple](#režim-simple-2)
+  - [Zařízení Thermometer](#zařízení-thermometer)
+    - [Režim Momentary](#režim-momentary)
+    - [Režim Average](#režim-average)
+    - [EventType MeasuredTemperature](#eventtype-measuredtemperature)
+  - [Zařízení HumidityMeter](#zařízení-humiditymeter)
+    - [Režim Momentary](#režim-momentary-1)
+    - [Režim Average](#režim-average-1)
+    - [EventType MeasuredHumidityTemperature](#eventtype-measuredhumiditytemperature)
+- [Společné události](#společné-události)
+  - [EventType Restart](#eventtype-restart)
+  - [EventType Alive](#eventtype-alive)
+  - [EventType Transport](#eventtype-transport)
+  - [EventType TamperOpen](#eventtype-tamperopen)
+  - [EventType TamperClosed](#eventtype-tamperclosed)
+  - [EventType AlertStart](#eventtype-alertstart)
+  - [EventType AlertContinue](#eventtype-alertcontinue)
+  - [EventType AlertEnd](#eventtype-alertend)
+
+# Způsoby předávání dat
 Data jsou předávána komunikačním protokolem ve formátu JSON a popisují události, které vznikají v systému SENSORIC. Položky datetime jsou v UTC podle ISO 8601. Pořadí parametrů není zaručeno a může se měnit.
-## 1.1 Předávání událostí přes HTTP callback
-Partner může specifikovat URL endpointů na které jsou události zasílány formou HTTP(S) POST requestů. Requesty mají kódování UTF-8 a Content-Type “application/json”.
 
-Partner může specifikovat URL pro dvě skupiny událostí:
-1) systémové události - souvisí se zařízením
-2) datové události - souvisí s dekódovanými daty ze zařízení
+## Předávání událostí přes HTTP callback
+Partner může specifikovat URL endpointů na které jsou události zasílány formou HTTP(S) POST requestů. Requesty mají kódování UTF-8 a Content-Type “application/json”. Systém se snaží předat události v režimu at-least-once, může tedy nastat situace že je událost doručena víckrát. Tuto situaci lze ošetři s využitím položky EventId, která obsahuje identifikátor události.
 
-### 1.1.1 URL endpointu pro systémové události
+### URL HTTP requestu
 Do URL je možné vložit zástupné parametry, které budou nahrazeny odpovídající hodnotou. 
 
-Parametry pro sestavení URL:
 | Parametr          | Popis                         |
 | :-----------------|:------------------------------|
 | ProtocolVersion   | verze komunikačního protokolu |
-| DeviceSerial      | sériové číslo senzoru         |
+| DeviceId          | identifikátor senzoru         |
+| MessageType       | typ zprávy                    |
 | EventType         | typ události                  |
 
 Příklad URL (doporučené nastavení):
 
-`https://nejakaadresa.cz/event/v{ProtocolVersion}/{DeviceSerial}/{EventType}/`
+`https://nejakaadresa.cz/event/v{ProtocolVersion}/{DeviceId}/{MessageType}/{EventType}/`
 
 Pro uvedenou URL budou volány např. tyto requesty:
 
-https://nejakaadresa.cz/event/v1/abc123/Restart/
+https://nejakaadresa.cz/event/v1/abc123/MagneticSimple/AlertStart/
 
-https://nejakaadresa.cz/event/v1/abc123/BatteryWarning/
+https://nejakaadresa.cz/event/v1/abc123/ThermometerAverage/Measured/
 
-### 1.1.2 URL endpointu pro datové události
-Do URL je možné vložit zástupné parametry, které budou nahrazeny odpovídající hodnotou. 
-
-Parametry pro sestavení URL:
-| Parametr          | Popis                         |
-| :-----------------|:------------------------------|
-| ProtocolVersion   | verze komunikačního protokolu |
-| DeviceSerial      | sériové číslo senzoru         |
-| DeviceType        | typ zařízení                  |
-| EventType         | typ události                  |
-
-Příklad URL (doporučené nastavení):
-
-`https://nejakaadresa.cz/event/v{ProtocolVersion}/{DeviceSerial}/{DeviceType}/{EventType}/`
-
-Pro uvedenou URL budou volány např. tyto requesty:
-
-https://nejakaadresa.cz/event/v1/abc123/PanicButton/Pressed/
-
-https://nejakaadresa.cz/event/v1/abc123/Thermometer/Measured/
-
-### 1.1.3 Hlavičky HTTP requestu
+### Hlavičky HTTP requestu
 Partner může specifikovat další konfiguraci přidáním HTTP hlavičy (klíč a hodnota). Tím lze např. vyřešit autorizaci.
 
-### 1.1.4 Odpověď na HTTP request
+### Odpověď na HTTP request
 
 Systém očekává v odpovědi HTTP status 200-299, kterým partner potvrdí přijetí události. Jiná odpověď je vyhodnocena jako nedoručení.
 
-### 1.1.5 Chování v případě nedoručení události
- V budoucnu bude řešena funkcionalita pro opakované odesílání nedoručených událostí. V současné verzi je nedoručená událost zahozena.
+### Chování v případě nedoručení události
+ V případě, že se nepodaří událost předat, systém pokus 10x opakuje s 5s prodlevami. Následně je událost zahozena.
 
-## 1.2 Předávání událostí přes MQTT
-Podpora plánována v budoucnu, bude upřesněno.
-
-## 2 Komunikační protokol
+# Komunikační protokol
 Data jsou odesílána vždy jako samostatné události. Události mají společnou část parametrů.
 
 Společné parametry:
 | Parametr          | Typ     | Popis                         |
 | :-----------------|:--------|:------------------------------|
 | ProtocolVersion   | integer | verze komunikačního protokolu |
-| DeviceSerial      | string  | sériové číslo senzoru         |
+| DeviceId          | string  | identifikátor senzoru         |
 | EventId           | string  | identifikátor události        |
 | EventTime         | string  | čas události                  |
+| MessageType       | string  | typ zprávy                    |
 | EventType         | string  | typ události                  |
 
-Datové události mají navíc parametr `DeviceType`:
-| Parametr          | Typ     | Popis                         |
-| :-----------------|:--------|:------------------------------|
-| DeviceType        | string  | typ zařízení                  |
+Další parametry jsou závislé na typu zprávy a události.
 
-Další parametry jsou závislé na typu události.
+# Zařízení a podporované události
 
-## 2.1 Systémové události
-Systémové události souvisí se zařízením, jsou společné pro všechna zařízení a vznikají nezávisle na dekódování dat přicházejících ze zařízení.
+## Zařízení WaterDetection
+Detekuje přítomnost vody v ohraničeném prostoru. 
 
-### 2.1.1 Událost 'Payload'
-Jedná se o speciální typ události která vzniká pouze u zařízení nastavených do režimu "raw komunikace", u kterých neprobíhá dekódování payloadu příchozích zpráv, ale data se partnerovi předávají v původní nezpracované podobě. Tato zařízení neposílají datové události (neprobíhá dekódování payloadu).
+![WaterDetection](images/devices/waterdetection.png)
 
-Parametry:
-| Parametr          | Typ     | Povinný | Popis
-| :-----------------|:--------|:--------|:-----
-| Payload           | string  | ano     | obsah payloadu v hexadecimálním tvaru
+### Režim Continuous
+Pokud v klidovém stavu dojde k zaplavení, je vyvolána událost `AlertStart`. Následně kontroluje každou minutu zda zaplavení trvá a pokud trvá, tak po 10 minutách vyvolá událost `AlertContinue`. Pokud i nadále zaplavení pokračuje pošle po dalších 10 minutách událost, že zaplavení pokračuje, další již neposílá. Po skončení zaplavení zařízení posílá `AlertEnd`.
 
-Ukázka zaslané události:
-```yaml
-{
-    "ProtocolVersion": 1,
-    "DeviceSerial": "abc123",
-    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
-    "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "Payload",
-    "Payload": "00aa11bb"
-}
-```
+> MessageType: WaterDetectionContinuous
 
-### 2.1.2 Událost 'Activation'
-Informuje o úspěšné aktivaci senzoru v systému.
-Bude upřesněno ...
+| EventType                                   | Popis |
+|:--------------------------------------------|:------|
+| [Restart](#eventtype-restart)               | Restart zařízení. |
+| [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
+| [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
+| [AlertStart](#eventtype-alertstart)         | Detekce zaplavení, začátek poplachu. |
+| [AlertContinue](#eventtype-alertcontinue)   | Zaplavení pokračuje. |
+| [AlertEnd](#eventtype-alertend)             | Konec zaplavení. |
 
-## 2.2 Společné datové události
-Události vzniklé na základě příchozích zpráv společné pro více typů zařízení. U každého typu je upřesněno které ze společných událostí u něj mohou nastat.
+## Zařízení Move
+Detekuje pohyb předmětu, na kterém je čidlo připevněno nebo položeno. 
 
-## 2.2.1 Událost 'Restart'
-Nastává při restartu senzoru.
+![MovementDetection](images/devices/movementdetection.png)
 
-Ukázka zaslané události:
-```yaml
-{
-    "ProtocolVersion": 1,
-    "DeviceSerial": "abc123",
-    "DeviceType": "Water",
-    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
-    "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "Restart"
-}
-```
+### Režim Continuous
+Pro případy, kdy chceme být informováni o tom, že se nějaký předmět pohnul. Například dveře, okno, kancelářský šuplík, taška, auto, motocykl, kolo, kočárek, batoh, kufr …
 
-## 2.2.2 Událost 'Transport'
-Nastává při přechodu senzoru do transportního režimu.
+Pokud v klidovém stavu dojde pohybu, je vyvolána událost `AlertStart`. Pokud v následujících 10 minutách znovu dojde k pohybu tak počítá opakování pohybu a po 10 minutách pošle `AlertContinue`. Chování se opakuje dokud dochází k pohybu. Pokud je zařízení 10 minut od začátku nebo pokračování pohybu v klidu, posílá `AlertEnd`.
 
-Ukázka zaslané události:
-```yaml
-{
-    "ProtocolVersion": 1,
-    "DeviceSerial": "abc123",
-    "DeviceType": "Water",
-    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
-    "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "Transport"
-}
-```
+> MessageType: MovementDetectionContinuous
 
-## 2.2.3 Událost 'Alive'
-Nastává při příjmu ohlašovací zprávy ze senzoru. Ohlašovací zpráva informuje o tom, že zařízení žije a odesílá se v pravidelném intervalu od odeslání poslední zprávy.
+| EventType                                   | Popis |
+|:--------------------------------------------|:------|
+| [Restart](#eventtype-restart)               | Restart zařízení. |
+| [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
+| [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
+| [TamperOpen](#eventtype-tamperopen)         | Otevření krytu zařízení, rozepnutí bezpečnostního spínače. |
+| [TamperClosed](#eventtype-tamperclosed)     | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
+| [AlertStart](#eventtype-alertstart)         | Detekován pohyb, začátek poplachu. |
+| [AlertContinue](#eventtype-alertcontinue)   | Bohyb pokračuje, pokračující poplach. |
+| [AlertEnd](#eventtype-alertend)             | Během 10 minut nedošlo k pohybu, konec poplachu. |
 
-Ukázka zaslané události:
-```yaml
-{
-    "ProtocolVersion": 1,
-    "DeviceSerial": "abc123",
-    "DeviceType": "Water",
-    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
-    "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "Alive"
-}
-```
+## Zařízení Magnetic
+Rozpozná oddálení/přiblížení čidla od magnetu.
 
-## 2.2.4 Událost 'AlertStart'
-Nastává při poplachovém stavu na senzoru.
+![Magnetic](images/devices/magnetic.png)
 
-Ukázka zaslané události:
-```yaml
-{
-    "ProtocolVersion": 1,
-    "DeviceSerial": "abc123",
-    "DeviceType": "Move",
-    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
-    "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "AlertStart"
-}
-```
+### Režim Simple
+Pro identifikaci, že došlo k otevření/zavření skříní, oken, dveří nebo pro identifikaci vzdálení se nějakého předmětu od jiného.
 
-## 2.2.5 Událost 'AlertContinue'
-Nastává při reportu pokračování poplachovém ze senzoru.
+Vždy při oddálení magnetu je vyvolána událost `AlertStart`. Při přiblížení magnetu zpět vyvolá `AlertEnd`.
 
-Ukázka zaslané události:
-```yaml
-{
-    "ProtocolVersion": 1,
-    "DeviceSerial": "abc123",
-    "DeviceType": "Move",
-    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
-    "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "AlertContinue"
-}
-```
+> MessageType: MagneticDetectionSimple
 
-## 2.2.6 Událost 'AlertEnd'
-Nastává při ukončení poplachového stavu na senzoru.
+| EventType                                   | Popis |
+|:--------------------------------------------|:------|
+| [Restart](#eventtype-restart)               | Restart zařízení. |
+| [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
+| [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
+| [TamperOpen](#eventtype-tamperopen)         | Otevření krytu zařízení, rozepnutí bezpečnostního spínače. |
+| [TamperClosed](#eventtype-tamperclosed)     | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
+| [AlertStart](#eventtype-alertstart)         | Magnet oddálen, začátek poplachu. |
+| [AlertEnd](#eventtype-alertend)             | Magnet přiblížen zpět, konec poplachu. |
 
-Ukázka zaslané události:
-```yaml
-{
-    "ProtocolVersion": 1,
-    "DeviceSerial": "abc123",
-    "DeviceType": "Move",
-    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
-    "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "AlertEnd"
-}
-```
+### Režim Continuous
+Pro sledování četnosti otevření/zavření dveří, krytů, průchodu pohyblivých částí.
 
-## 2.2.7 Událost 'TamperOpen'
-Nastává při rozepnutí tamperu - otevření krytu senzoru.
+Pokud v klidovém stavu dojde k oddálení magnetu, je vyvolána událost `AlertStart`. Na přiblížení magnetu nijak nereaguje, ale pokud dojde do 10 minut k opětovnému oddálení magnetu tak počítá kolikrát se oddálil a po 10 minutách pošle `AlertContinue`. Chování se opakuje dokud se něco děje. Pokud se během 10 minut nic nestane (nedojde k oddálení magnetu), zařízení posílá `AlertEnd`.
 
-Ukázka zaslané události:
-```yaml
-{
-    "ProtocolVersion": 1,
-    "DeviceSerial": "abc123",
-    "DeviceType": "Move",
-    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
-    "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "TamperOpen"
-}
-```
+> MessageType: MagneticDetectionContinuous
 
-## 2.2.8 Událost 'TamperClosed'
-Nastává při sepnutí tamperu - zavření krytu senzoru.
+| EventType                                   | Popis |
+|:--------------------------------------------|:------|
+| [Restart](#eventtype-restart)               | Restart zařízení. |
+| [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
+| [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
+| [TamperOpen](#eventtype-tamperopen)         | Otevření krytu zařízení, rozepnutí bezpečnostního spínače. |
+| [TamperClosed](#eventtype-tamperclosed)     | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
+| [AlertStart](#eventtype-alertstart)         | Magnet oddálen, začátek poplachu. |
+| [AlertContinue](#eventtype-alertcontinue)   | Dění na magnetu se opakuje, poplach pokračuje. |
+| [AlertEnd](#eventtype-alertend)             | Během 10 minut nedošlo k oddálení magnetu, konec poplachu. |
 
-Ukázka zaslané události:
-```yaml
-{
-    "ProtocolVersion": 1,
-    "DeviceSerial": "abc123",
-    "DeviceType": "Move",
-    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
-    "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "TamperClosed"
-}
-```
+## Zařízení Pir
+Detekuje pohyb nebo přítomnost člověka ve vymezeném prostoru do vzdálenosti 10m. 
 
-## 2.2.9 Událost 'FreeFall'
-Nastává při detekci volného pádu senzoru.
+![MovementDetection](images/devices/pir.png)
 
-Ukázka zaslané události:
-```yaml
-{
-    "ProtocolVersion": 1,
-    "DeviceSerial": "abc123",
-    "DeviceType": "Moto",
-    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
-    "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "FreeFall"
-}
-```
+### Režim Simple
+Pro detekci, že v místnosti nebo vymezeném prostoru došlo k pohybu. 
 
-## 2.3 Datové události pro zařízení 'WaterDetection'
-Události pro vodní/záplavový senzor.
+Jakmile senzor detekuje pohyb pošle zprávu s událostí `AlertStart`. Pokud i nadále detekuje pohyb, pošle po 10 minutách zprávu s událostí `AlertContinue`, že pohyb pokračuje, kolik pohybů zaznamenal a kdy nastal poslední. Pokud i nadále detekuje pohyb pošle po dalších 10-ti minutách oět zprávu, že pohyb pokračuje a potom již zprávy o pokračování neposílá. Senzor pošle zprávu s událostí `AlertEnd`, že pohyb skončil pokud 10 minut nenastane žádný pohyb.
 
-### Společné datové události
-- Restart
-- Alive
-- AlertStart   *... začátek zaplavení*
-- AlertContinue   *... zaplavení pokračuje*
-- AlertEnd   *... konec zaplavení*
+> MessageType: PirSimple
 
-## 2.4 Datové události pro zařízení 'MovementDetection'
-Události pro pohybový senzor.
+| EventType                                   | Popis |
+|:--------------------------------------------|:------|
+| [Restart](#eventtype-restart)               | Restart zařízení. |
+| [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
+| [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
+| [TamperOpen](#eventtype-tamperopen)         | Otevření krytu zařízení, rozepnutí bezpečnostního spínače. |
+| [TamperClosed](#eventtype-tamperclosed)     | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
+| [AlertStart](#eventtype-alertstart)         | Detekován pohyb, začátek poplachu. |
+| [AlertContinue](#eventtype-alertcontinue)   | Bohyb pokračuje, pokračující poplach. |
+| [AlertEnd](#eventtype-alertend)             | Během 10 minut nedošlo k pohybu, konec poplachu. |
 
-### Společné datové události
-- Restart
-- Alive
-- AlertStart   *... začátek pohybu*
-- AlertContinue   *... pohyb pokračuje*
-- AlertEnd   *... konec pohybu*
-- TamperOpen
-- TamperClosed
+### Režim Continuous
+Pro identifikaci, že se v místnosti nebo ohraničeném prostoru pohybuje člověk, kdy a jak často. 
 
-## 2.5 Datové události pro zařízení 'Pir'
-Události pro PIR senzor.
+Jakmile senzor detekuje pohyb pošle zprávu s událostí `AlertStart`. Pokud i nadále detekuje pohyb, posílá v 10 minutových intervalech zprávy s událostí `AlertContinue`, že pohyb pokračuje, kolik pohybů zaznamenal a kdy nastal poslední. Senzor pošle zprávu s událostí `AlertEnd`, že pohyb skončil pokud 10 minut nenastane žádný pohyb.
 
-### Společné datové události
-- Restart
-- Alive
-- AlertStart   *... začátek pohybu*
-- AlertContinue   *... pohyb pokračuje*
-- AlertEnd   *... konec pohybu*
-- TamperOpen
-- TamperClosed
+> MessageType: PirContinuous
 
-## 2.6 Datové události pro zařízení 'Magnetic'
-Události pro magnetický senzor.
+| EventType                                   | Popis |
+|:--------------------------------------------|:------|
+| [Restart](#eventtype-restart)               | Restart zařízení. |
+| [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
+| [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
+| [TamperOpen](#eventtype-tamperopen)         | Otevření krytu zařízení, rozepnutí bezpečnostního spínače. |
+| [TamperClosed](#eventtype-tamperclosed)     | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
+| [AlertStart](#eventtype-alertstart)         | Detekován pohyb, začátek poplachu. |
+| [AlertContinue](#eventtype-alertcontinue)   | Bohyb pokračuje, pokračující poplach. |
+| [AlertEnd](#eventtype-alertend)             | Během 10 minut nedošlo k pohybu, konec poplachu. |
 
-### Společné datové události
-- Restart
-- Alive
-- AlertStart   *... význam zavisí na režimu senzoru*
-- AlertContinue   *... význam a to zda událost může nastat zavisí na režimu senzoru*
-- AlertEnd   *... význam zavisí na režimu senzoru*
-- TamperOpen
-- TamperClosed
+## Zařízení AlertButton
+Zařízení s tlačítkem pro přivolání pomoci nebo spuštění poplachu.
 
-## 2.7 Datové události pro zařízení 'AlertButton'
-Události pro panic tlačítko.
+![MovementDetection](images/devices/panic.png)
+![MovementDetection](images/devices/sos.png)
 
-### Společné datové události
-- Restart
-- Alive
-- AlertStart   *... stisknutí tlačítka*
+### Režim Simple
+Zařízení po stitknutí pošle zprávu s událostí `AlertStart`.
 
-## 2.8 Datové události pro zařízení 'Thermometer'
-Události pro teploměr.
+> MessageType: AlertButtonSimple
 
-### Společné datové události
-Kromě datových zpráv specifických pro tento senzor mohou nastat tyto společné události:
-- Restart
-- Alive
+| EventType                                   | Popis |
+|:--------------------------------------------|:------|
+| [Restart](#eventtype-restart)               | Restart zařízení. |
+| [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
+| [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
+| [AlertStart](#eventtype-alertstart)         | Stisknuto, začátek poplachu. |
 
-## 2.8.1 Událost 'Measured'
+## Zařízení Thermometer
+Měří teplotu okolního prostředí.
+
+![MovementDetection](images/devices/humiditymeter.png)
+
+### Režim Momentary
+Jednou za X minut provede měření teploty a odešle událost `MeasuredTemperature`.
+
+> MessageType: ThermometerMomentary
+
+| EventType                                   | Popis |
+|:--------------------------------------------|:------|
+| [Restart](#eventtype-restart)               | Restart zařízení. |
+| [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
+| [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
+| [MeasuredTemperature](#eventtype-measuredtemperature)             | Naměřené veličiny. |
+
+### Režim Average
+Každou minutu měří teplotu. Po X měření provede výpočet průměrné hodnoty a odešle událost `MeasuredTemperature`.
+
+> MessageType: ThermometerAverage
+
+| EventType                                   | Popis |
+|:--------------------------------------------|:------|
+| [Restart](#eventtype-restart)               | Restart zařízení. |
+| [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
+| [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
+| [MeasuredTemperature](#eventtype-measuredtemperature)             | Naměřené veličiny. |
+
+### EventType MeasuredTemperature
 Nastává při odeslání naměřené hodnoty.
 
 Dodatečné předávané parametry:
@@ -322,55 +279,45 @@ Ukázka zaslané události:
 ```yaml
 {
     "ProtocolVersion": 1,
-    "DeviceSerial": "abc123",
-    "DeviceType": "Thermometer",
+    "DeviceId": "abc123",
+    "MessageType": "ThermometerMomentary",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "Measured",
+    "EventType": "MeasuredTemperature",
     "Temperature": 25.5
 }
 ```
 
-## 2.8.2 Událost MeasuredLost *
-**\* Zpráva v současnosti není implementována.**
+## Zařízení HumidityMeter
+Měří teplotu a vlhkost okolního prostředí.
 
-Při příchodu zpráv z teploměru probíhá kontrola, zda před aktuální datovou zprávou nedošlo k výpadku. Pokud je detekován výpadek, systém vygeneruje událost *MeasuredLost* (jednu nebo více) a následně odešle i aktuální událost *Measured*.
+![MovementDetection](images/devices/humiditymeter.png)
 
-Zpráva *MeasuredLost* obsahuje odhadovaný čas kdy k vypadení zprávy došlo, upřesnění typu detekce a hodnotu.
+### Režim Momentary
+Jednou za X minut provede měření teploty a vlhkosti a odešle událost `MeasuredHumidityTemperature`.
 
-Dodatečné předávané parametry:
-| Parametr          | Typ     | Povinný | Popis
-| :-----------------|:--------|:--------|:-----
-| LostValueTime     | string  | ano     | odhadovaný čas výpadku
-| LostValueType     | string  | ano     | upřesnění typu
-| Temperature       | float   | ano     | hodnota teploty
+> MessageType: HumidityMeterMomentary
 
-*LostValueType* informuje o tom, zda byla zpráva rekonstruována (*LostValueType: Recovered*) a hodnota *Temperature* je tedy přesná, nebo byla dopočítána (*LostValueType: Calculated*). 
+| EventType                                   | Popis |
+|:--------------------------------------------|:------|
+| [Restart](#eventtype-restart)               | Restart zařízení. |
+| [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
+| [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
+| [MeasuredHumidityTemperature](#eventtype-measuredhumiditytemperature)             | Naměřené veličiny. |
 
-Ukázka zaslané události:
-```yaml
-{
-    "ProtocolVersion": 1,
-    "DeviceSerial": "abc123",
-    "DeviceType": "Thermometer",
-    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
-    "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "MeasuredLost",
-    "LostValueTime": "2021-05-03T14:20:31.8437511Z",
-    "LostValueType": "Recovered",
-    "Temperature": 25.5
-}
-```
+### Režim Average
+Každou minutu měří teplotu a vlhkost. Po X měření provede výpočet průměrné hodnoty a odešle událost `MeasuredHumidityTemperature`.
 
-## 2.9 Datové události pro zařízení 'HumidityMeter'
-Události pro vlhkoměr.
+> MessageType: HumidityMeterAverage
 
-### Společné datové události
-Kromě datových zpráv specifických pro tento senzor mohou nastat tyto společné události:
-- Restart
-- Alive
+| EventType                                   | Popis |
+|:--------------------------------------------|:------|
+| [Restart](#eventtype-restart)               | Restart zařízení. |
+| [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
+| [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
+| [MeasuredHumidityTemperature](#eventtype-measuredhumiditytemperature)             | Naměřené veličiny. |
 
-## 2.9.1 Událost 'Measured'
+### EventType MeasuredHumidityTemperature
 Nastává při odeslání naměřené hodnoty.
 
 Dodatečné předávané parametry:
@@ -383,45 +330,135 @@ Ukázka zaslané události:
 ```yaml
 {
     "ProtocolVersion": 1,
-    "DeviceSerial": "abc123",
-    "DeviceType": "HumidityMeter",
+    "DeviceId": "abc123",
+    "MessageType": "HumidityMeterMomentary",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "Measured",
+    "EventType": "MeasuredHumidityTemperature",
     "Temperature": 25.5,
     "Humidity": 27.5
 }
 ```
 
-## 2.9.2 Událost MeasuredLost *
-**\* Zpráva v současnosti není implementována.**
+# Společné události
+Události na ktré je odkázáno z konkrétních typů zpráv.
 
-Při příchodu zpráv z vlhkoměru probíhá kontrola, zda před aktuální datovou zprávou nedošlo k výpadku. Pokud je detekován výpadek, systém vygeneruje událost *MeasuredLost* (jednu nebo více) a následně odešle i aktuální událost *Measured*.
-
-Zpráva *MeasuredLost* obsahuje odhadovaný čas kdy k vypadení zprávy došlo, upřesnění typu detekce a hodnoty.
-
-Dodatečné předávané parametry:
-| Parametr          | Typ     | Povinný | Popis
-| :-----------------|:--------|:--------|:-----
-| LostValueTime     | string  | ano     | odhadovaný čas výpadku
-| LostValueType     | string  | ano     | upřesnění typu
-| Temperature       | float   | ano     | hodnota teploty
-| Humidity          | float   | ano     | hodnota vlhkosti
-
-*LostValueType* informuje o tom, zda byla zpráva rekonstruována (*LostValueType: Recovered*) a hodnota *Temperature* je tedy přesná, nebo byla dopočítána (*LostValueType: Calculated*). 
+## EventType Restart
+Nastává při restartu zařízení.
 
 Ukázka zaslané události:
 ```yaml
 {
     "ProtocolVersion": 1,
-    "DeviceSerial": "abc123",
-    "DeviceType": "HumidityMeter",
+    "DeviceId": "abc123",
+    "MessageType": "MagneticDetectionSimple",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "MeasuredLost",
-    "LostValueTime": "2021-05-03T14:20:31.8437511Z",
-    "LostValueType": "Recovered",
-    "Temperature": 25.5,
-    "Humidity": 27.5
+    "EventType": "Restart"
+}
+```
+
+## EventType Alive
+Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení.
+
+Ukázka zaslané události:
+```yaml
+{
+    "ProtocolVersion": 1,
+    "DeviceId": "abc123",
+    "MessageType": "MagneticDetectionSimple",
+    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
+    "EventTime": "2021-05-03T14:25:31.8437511Z",
+    "EventType": "Alive"
+}
+```
+
+## EventType Transport
+Nastává při přechodu senzoru do transportního režimu.
+
+Ukázka zaslané události:
+```yaml
+{
+    "ProtocolVersion": 1,
+    "DeviceId": "abc123",
+    "MessageType": "MagneticDetectionSimple",
+    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
+    "EventTime": "2021-05-03T14:25:31.8437511Z",
+    "EventType": "Transport"
+}
+```
+
+## EventType TamperOpen
+Nastává při rozepnutí tamperu - otevření krytu senzoru.
+
+Ukázka zaslané události:
+```yaml
+{
+    "ProtocolVersion": 1,
+    "DeviceId": "abc123",
+    "MessageType": "MagneticDetectionSimple",
+    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
+    "EventTime": "2021-05-03T14:25:31.8437511Z",
+    "EventType": "TamperOpen"
+}
+```
+
+## EventType TamperClosed
+Nastává při sepnutí tamperu - zavření krytu senzoru.
+
+Ukázka zaslané události:
+```yaml
+{
+    "ProtocolVersion": 1,
+    "DeviceId": "abc123",
+    "MessageType": "MagneticDetectionSimple",
+    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
+    "EventTime": "2021-05-03T14:25:31.8437511Z",
+    "EventType": "TamperClosed"
+}
+```
+
+## EventType AlertStart
+Nastává při začátku poplachového stavu na senzoru.
+
+Ukázka zaslané události:
+```yaml
+{
+    "ProtocolVersion": 1,
+    "DeviceId": "abc123",
+    "MessageType": "MagneticDetectionSimple",
+    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
+    "EventTime": "2021-05-03T14:25:31.8437511Z",
+    "EventType": "AlertStart"
+}
+```
+
+## EventType AlertContinue
+Nastává při reportu pokračování poplachovém ze senzoru.
+
+Ukázka zaslané události:
+```yaml
+{
+    "ProtocolVersion": 1,
+    "DeviceId": "abc123",
+    "MessageType": "MagneticDetectionSimple",
+    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
+    "EventTime": "2021-05-03T14:25:31.8437511Z",
+    "EventType": "AlertContinue"
+}
+```
+
+## EventType AlertEnd
+Nastává při ukončení poplachového stavu na senzoru.
+
+Ukázka zaslané události:
+```yaml
+{
+    "ProtocolVersion": 1,
+    "DeviceId": "abc123",
+    "MessageType": "MagneticDetectionSimple",
+    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
+    "EventTime": "2021-05-03T14:25:31.8437511Z",
+    "EventType": "AlertEnd"
 }
 ```
