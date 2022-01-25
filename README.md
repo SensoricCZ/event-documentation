@@ -15,17 +15,17 @@ Dokument popisuje způsob předávání událostí ze systému SENSORIC do aplik
 - [Komunikační protokol](#komunikační-protokol)
 - [Zařízení a podporované události](#zařízení-a-podporované-události)
   - [Zařízení WaterDetection](#zařízení-waterdetection)
-    - [Režim Continuous](#režim-continuous)
-  - [Zařízení Move](#zařízení-move)
-    - [Režim Continuous](#režim-continuous-1)
-  - [Zařízení Magnetic](#zařízení-magnetic)
     - [Režim Simple](#režim-simple)
-    - [Režim Continuous](#režim-continuous-2)
-  - [Zařízení Pir](#zařízení-pir)
+  - [Zařízení MovementDetection](#zařízení-movementdetection)
+    - [Režim Continuous](#režim-continuous)
+  - [Zařízení Magnetic](#zařízení-magnetic)
     - [Režim Simple](#režim-simple-1)
-    - [Režim Continuous](#režim-continuous-3)
-  - [Zařízení AlertButton](#zařízení-alertbutton)
+    - [Režim Continuous](#režim-continuous-1)
+  - [Zařízení Pir](#zařízení-pir)
     - [Režim Simple](#režim-simple-2)
+    - [Režim Continuous](#režim-continuous-2)
+  - [Zařízení AlertButton](#zařízení-alertbutton)
+    - [Režim Simple](#režim-simple-3)
   - [Zařízení Thermometer](#zařízení-thermometer)
     - [Režim Momentary](#režim-momentary)
     - [Režim Average](#režim-average)
@@ -102,21 +102,21 @@ Detekuje přítomnost vody v ohraničeném prostoru.
 
 ![WaterDetection](images/devices/waterdetection.png)
 
-### Režim Continuous
-Pokud v klidovém stavu dojde k zaplavení, je vyvolána událost `AlertStart`. Následně kontroluje každou minutu zda zaplavení trvá a pokud trvá, tak po 10 minutách vyvolá událost `AlertContinue`. Pokud i nadále zaplavení pokračuje pošle po dalších 10 minutách událost, že zaplavení pokračuje, další již neposílá. Po skončení zaplavení zařízení posílá `AlertEnd`.
+### Režim Simple
+Pokud v klidovém stavu dojde k zaplavení, je vyvolána událost `AlertStart`. Následně kontroluje každou minutu zda zaplavení trvá a pokud trvá, tak po 10 minutách vyvolá událost `AlertContinue`. Pokud i nadále zaplavení pokračuje pošle po dalších 10 minutách událost `AlertContinue`, že zaplavení pokračuje, další již neposílá. Po skončení zaplavení zařízení posílá `AlertEnd`.
 
-> MessageType: WaterDetectionContinuous
+> MessageType: WaterDetectionSimple
 
 | EventType                                   | Popis |
 |:--------------------------------------------|:------|
 | [Restart](#eventtype-restart)               | Restart zařízení. |
 | [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
 | [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
-| [AlertStart](#eventtype-alertstart)         | Detekce zaplavení, začátek poplachu. |
+| [AlertStart](#eventtype-alertstart)         | Detekce vzniku zaplavení. |
 | [AlertContinue](#eventtype-alertcontinue)   | Zaplavení pokračuje. |
 | [AlertEnd](#eventtype-alertend)             | Konec zaplavení. |
 
-## Zařízení Move
+## Zařízení MovementDetection
 Detekuje pohyb předmětu, na kterém je čidlo připevněno nebo položeno. 
 
 ![MovementDetection](images/devices/movementdetection.png)
@@ -124,7 +124,7 @@ Detekuje pohyb předmětu, na kterém je čidlo připevněno nebo položeno.
 ### Režim Continuous
 Pro případy, kdy chceme být informováni o tom, že se nějaký předmět pohnul. Například dveře, okno, kancelářský šuplík, taška, auto, motocykl, kolo, kočárek, batoh, kufr …
 
-Pokud v klidovém stavu dojde pohybu, je vyvolána událost `AlertStart`. Pokud v následujících 10 minutách znovu dojde k pohybu tak počítá opakování pohybu a po 10 minutách pošle `AlertContinue`. Chování se opakuje dokud dochází k pohybu. Pokud je zařízení 10 minut od začátku nebo pokračování pohybu v klidu, posílá `AlertEnd`.
+Pokud v klidovém stavu dojde pohybu, je vyvolána událost `AlertStart`. Pokud v následujících 10 minutách znovu dojde k pohybu tak počítá opakování pohybu a po 10 minutách pošle `AlertContinue`. `AlertContinue` se opakuje dokud dochází k pohybu. Pokud je zařízení 10 minut od začátku nebo pokračování pohybu v klidu, posílá `AlertEnd`.
 
 > MessageType: MovementDetectionContinuous
 
@@ -134,10 +134,12 @@ Pokud v klidovém stavu dojde pohybu, je vyvolána událost `AlertStart`. Pokud 
 | [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
 | [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
 | [TamperOpen](#eventtype-tamperopen)         | Otevření krytu zařízení, rozepnutí bezpečnostního spínače. |
-| [TamperClosed](#eventtype-tamperclosed)     | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
-| [AlertStart](#eventtype-alertstart)         | Detekován pohyb, začátek poplachu. |
-| [AlertContinue](#eventtype-alertcontinue)   | Bohyb pokračuje, pokračující poplach. |
-| [AlertEnd](#eventtype-alertend)             | Během 10 minut nedošlo k pohybu, konec poplachu. |
+| [TamperClosed](#eventtype-tamperclosed) *   | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
+| [AlertStart](#eventtype-alertstart)         | Detekce začátku pohybu. |
+| [AlertContinue](#eventtype-alertcontinue)   | Bohyb pokračuje. |
+| [AlertEnd](#eventtype-alertend)             | Během 10 minut nedošlo k pohybu. |
+
+\* TamperClosed aktuální verze senzorů nepodporuje
 
 ## Zařízení Magnetic
 Rozpozná oddálení/přiblížení čidla od magnetu.
@@ -157,14 +159,16 @@ Vždy při oddálení magnetu je vyvolána událost `AlertStart`. Při přiblí�
 | [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
 | [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
 | [TamperOpen](#eventtype-tamperopen)         | Otevření krytu zařízení, rozepnutí bezpečnostního spínače. |
-| [TamperClosed](#eventtype-tamperclosed)     | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
+| [TamperClosed](#eventtype-tamperclosed) *   | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
 | [AlertStart](#eventtype-alertstart)         | Magnet oddálen, začátek poplachu. |
 | [AlertEnd](#eventtype-alertend)             | Magnet přiblížen zpět, konec poplachu. |
+
+\* TamperClosed aktuální verze senzorů nepodporuje
 
 ### Režim Continuous
 Pro sledování četnosti otevření/zavření dveří, krytů, průchodu pohyblivých částí.
 
-Pokud v klidovém stavu dojde k oddálení magnetu, je vyvolána událost `AlertStart`. Na přiblížení magnetu nijak nereaguje, ale pokud dojde do 10 minut k opětovnému oddálení magnetu tak počítá kolikrát se oddálil a po 10 minutách pošle `AlertContinue`. Chování se opakuje dokud se něco děje. Pokud se během 10 minut nic nestane (nedojde k oddálení magnetu), zařízení posílá `AlertEnd`.
+Pokud v klidovém stavu dojde k oddálení magnetu, je vyvolána událost `AlertStart`. Na přiblížení magnetu nijak nereaguje, ale pokud dojde do 10 minut k opětovnému oddálení magnetu tak počítá kolikrát se oddálil a po 10 minutách pošle `AlertContinue`. `AlertContinue` se opakuje dokud se něco děje. Pokud se během 10 minut nic nestane (nedojde k oddálení magnetu), zařízení posílá `AlertEnd`.
 
 > MessageType: MagneticDetectionContinuous
 
@@ -174,20 +178,22 @@ Pokud v klidovém stavu dojde k oddálení magnetu, je vyvolána událost `Alert
 | [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
 | [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
 | [TamperOpen](#eventtype-tamperopen)         | Otevření krytu zařízení, rozepnutí bezpečnostního spínače. |
-| [TamperClosed](#eventtype-tamperclosed)     | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
+| [TamperClosed](#eventtype-tamperclosed) *   | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
 | [AlertStart](#eventtype-alertstart)         | Magnet oddálen, začátek poplachu. |
 | [AlertContinue](#eventtype-alertcontinue)   | Dění na magnetu se opakuje, poplach pokračuje. |
 | [AlertEnd](#eventtype-alertend)             | Během 10 minut nedošlo k oddálení magnetu, konec poplachu. |
 
+\* TamperClosed aktuální verze senzorů nepodporuje
+
 ## Zařízení Pir
 Detekuje pohyb nebo přítomnost člověka ve vymezeném prostoru do vzdálenosti 10m. 
 
-![MovementDetection](images/devices/pir.png)
+![Pir](images/devices/pir.png)
 
 ### Režim Simple
 Pro detekci, že v místnosti nebo vymezeném prostoru došlo k pohybu. 
 
-Jakmile senzor detekuje pohyb pošle zprávu s událostí `AlertStart`. Pokud i nadále detekuje pohyb, pošle po 10 minutách zprávu s událostí `AlertContinue`, že pohyb pokračuje, kolik pohybů zaznamenal a kdy nastal poslední. Pokud i nadále detekuje pohyb pošle po dalších 10-ti minutách oět zprávu, že pohyb pokračuje a potom již zprávy o pokračování neposílá. Senzor pošle zprávu s událostí `AlertEnd`, že pohyb skončil pokud 10 minut nenastane žádný pohyb.
+Jakmile senzor detekuje pohyb pošle zprávu s událostí `AlertStart`. Pokud i nadále detekuje pohyb, pošle po 10 minutách zprávu s událostí `AlertContinue`, že pohyb pokračuje, kolik pohybů zaznamenal a kdy nastal poslední. Pokud i nadále detekuje pohyb pošle po dalších 10-ti minutách zprávu `AlertContinue`, že pohyb pokračuje a potom již zprávy o pokračování neposílá. Senzor pošle zprávu s událostí `AlertEnd`, že pohyb skončil pokud 10 minut nenastane žádný pohyb.
 
 > MessageType: PirSimple
 
@@ -197,10 +203,12 @@ Jakmile senzor detekuje pohyb pošle zprávu s událostí `AlertStart`. Pokud i 
 | [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
 | [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
 | [TamperOpen](#eventtype-tamperopen)         | Otevření krytu zařízení, rozepnutí bezpečnostního spínače. |
-| [TamperClosed](#eventtype-tamperclosed)     | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
-| [AlertStart](#eventtype-alertstart)         | Detekován pohyb, začátek poplachu. |
-| [AlertContinue](#eventtype-alertcontinue)   | Bohyb pokračuje, pokračující poplach. |
-| [AlertEnd](#eventtype-alertend)             | Během 10 minut nedošlo k pohybu, konec poplachu. |
+| [TamperClosed](#eventtype-tamperclosed) *   | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
+| [AlertStart](#eventtype-alertstart)         | Detekce začátku pohybu. |
+| [AlertContinue](#eventtype-alertcontinue)   | Bohyb pokračuje. |
+| [AlertEnd](#eventtype-alertend)             | Během 10 minut nedošlo k pohybu. |
+
+\* TamperClosed aktuální verze senzorů nepodporuje
 
 ### Režim Continuous
 Pro identifikaci, že se v místnosti nebo ohraničeném prostoru pohybuje člověk, kdy a jak často. 
@@ -215,19 +223,21 @@ Jakmile senzor detekuje pohyb pošle zprávu s událostí `AlertStart`. Pokud i 
 | [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
 | [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
 | [TamperOpen](#eventtype-tamperopen)         | Otevření krytu zařízení, rozepnutí bezpečnostního spínače. |
-| [TamperClosed](#eventtype-tamperclosed)     | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
-| [AlertStart](#eventtype-alertstart)         | Detekován pohyb, začátek poplachu. |
-| [AlertContinue](#eventtype-alertcontinue)   | Bohyb pokračuje, pokračující poplach. |
-| [AlertEnd](#eventtype-alertend)             | Během 10 minut nedošlo k pohybu, konec poplachu. |
+| [TamperClosed](#eventtype-tamperclosed) *   | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
+| [AlertStart](#eventtype-alertstart)         | Detekce začátku pohybu. |
+| [AlertContinue](#eventtype-alertcontinue)   | Bohyb pokračuje. |
+| [AlertEnd](#eventtype-alertend)             | Během 10 minut nedošlo k pohybu. |
+
+\* TamperClosed aktuální verze senzorů nepodporuje
 
 ## Zařízení AlertButton
 Zařízení s tlačítkem pro přivolání pomoci nebo spuštění poplachu.
 
-![MovementDetection](images/devices/panic.png)
-![MovementDetection](images/devices/sos.png)
+![AlertButton](images/devices/panic.png)
+![AlertButton](images/devices/sos.png)
 
 ### Režim Simple
-Zařízení po stitknutí pošle zprávu s událostí `AlertStart`.
+Zařízení po stitknutí tlačítka pošle zprávu s událostí `AlertStart`.
 
 > MessageType: AlertButtonSimple
 
@@ -241,7 +251,7 @@ Zařízení po stitknutí pošle zprávu s událostí `AlertStart`.
 ## Zařízení Thermometer
 Měří teplotu okolního prostředí.
 
-![MovementDetection](images/devices/humiditymeter.png)
+![Thermometer](images/devices/humiditymeter.png)
 
 ### Režim Momentary
 Jednou za X minut provede měření teploty a odešle událost `MeasuredTemperature`.
@@ -253,7 +263,7 @@ Jednou za X minut provede měření teploty a odešle událost `MeasuredTemperat
 | [Restart](#eventtype-restart)               | Restart zařízení. |
 | [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
 | [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
-| [MeasuredTemperature](#eventtype-measuredtemperature)             | Naměřené veličiny. |
+| [MeasuredTemperature](#eventtype-measuredtemperature) | Naměřené veličiny. |
 
 ### Režim Average
 Každou minutu měří teplotu. Po X měření provede výpočet průměrné hodnoty a odešle událost `MeasuredTemperature`.
@@ -265,7 +275,7 @@ Každou minutu měří teplotu. Po X měření provede výpočet průměrné hod
 | [Restart](#eventtype-restart)               | Restart zařízení. |
 | [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
 | [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
-| [MeasuredTemperature](#eventtype-measuredtemperature)             | Naměřené veličiny. |
+| [MeasuredTemperature](#eventtype-measuredtemperature) | Naměřené veličiny. |
 
 ### EventType MeasuredTemperature
 Nastává při odeslání naměřené hodnoty.
@@ -291,7 +301,8 @@ Ukázka zaslané události:
 ## Zařízení HumidityMeter
 Měří teplotu a vlhkost okolního prostředí.
 
-![MovementDetection](images/devices/humiditymeter.png)
+![HumidityMeter](images/devices/humiditymeter.png)
+![HumidityMeter](images/devices/movementdetection.png)
 
 ### Režim Momentary
 Jednou za X minut provede měření teploty a vlhkosti a odešle událost `MeasuredHumidityTemperature`.
@@ -303,7 +314,7 @@ Jednou za X minut provede měření teploty a vlhkosti a odešle událost `Measu
 | [Restart](#eventtype-restart)               | Restart zařízení. |
 | [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
 | [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
-| [MeasuredHumidityTemperature](#eventtype-measuredhumiditytemperature)             | Naměřené veličiny. |
+| [MeasuredHumidityTemperature](#eventtype-measuredhumiditytemperature) | Naměřené veličiny. |
 
 ### Režim Average
 Každou minutu měří teplotu a vlhkost. Po X měření provede výpočet průměrné hodnoty a odešle událost `MeasuredHumidityTemperature`.
@@ -315,7 +326,7 @@ Každou minutu měří teplotu a vlhkost. Po X měření provede výpočet prům
 | [Restart](#eventtype-restart)               | Restart zařízení. |
 | [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
 | [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
-| [MeasuredHumidityTemperature](#eventtype-measuredhumiditytemperature)             | Naměřené veličiny. |
+| [MeasuredHumidityTemperature](#eventtype-measuredhumiditytemperature) | Naměřené veličiny. |
 
 ### EventType MeasuredHumidityTemperature
 Nastává při odeslání naměřené hodnoty.
@@ -344,7 +355,7 @@ Ukázka zaslané události:
 Události na ktré je odkázáno z konkrétních typů zpráv.
 
 ## EventType Restart
-Nastává při restartu zařízení.
+Nastává při restartu zařízení. K restartu může dojít stiskem restartovacího tlačítka umístěného na plošném spoji čidla nebo restart může vyvolat firmware čidla při hardwarové chybě nebo u některých změn konfigurace čidla pomocí příkazu zaslaného prostřednictvím downlink API.
 
 Ukázka zaslané události:
 ```yaml
@@ -374,7 +385,9 @@ Ukázka zaslané události:
 ```
 
 ## EventType Transport
-Nastává při přechodu senzoru do transportního režimu.
+Nastává při přechodu senzoru do transportního režimu, ke kterému dojde po vložení nové baterie nebo pomocí příkazu zaslaného prostřednictvím downlink API.
+
+Čidlo v transportním režimu má velmi nízkou spotřebu a neposílá žádné zprávy. Pro probuzení čidla z transportního režimu je třeba stisknout RESET tlačítko umístěné na plošném spoji čidla.
 
 Ukázka zaslané události:
 ```yaml
@@ -419,7 +432,7 @@ Ukázka zaslané události:
 ```
 
 ## EventType AlertStart
-Nastává při začátku poplachového stavu na senzoru.
+Nastává při prvním vzniku události jako např. zaplavení kontaktů, oddálení magnetu, zaregistrování pohybu.
 
 Ukázka zaslané události:
 ```yaml
@@ -434,7 +447,7 @@ Ukázka zaslané události:
 ```
 
 ## EventType AlertContinue
-Nastává při reportu pokračování poplachovém ze senzoru.
+Nastává pokud událost pokračuje.
 
 Ukázka zaslané události:
 ```yaml
@@ -449,7 +462,7 @@ Ukázka zaslané události:
 ```
 
 ## EventType AlertEnd
-Nastává při ukončení poplachového stavu na senzoru.
+Situace kdy událost nastane je popsána u každého zařízení které tuto událost zasílá.
 
 Ukázka zaslané události:
 ```yaml
