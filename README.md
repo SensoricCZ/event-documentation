@@ -253,18 +253,6 @@ Měří teplotu okolního prostředí.
 
 ![Thermometer](images/devices/humiditymeter.png)
 
-### Režim Momentary
-Jednou za X minut provede měření teploty a odešle událost `MeasuredTemperature`.
-
-> MessageType: ThermometerMomentary
-
-| EventType                                   | Popis |
-|:--------------------------------------------|:------|
-| [Restart](#eventtype-restart)               | Restart zařízení. |
-| [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
-| [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
-| [MeasuredTemperature](#eventtype-measuredtemperature) | Naměřené veličiny. |
-
 ### Režim Average
 Každou minutu měří teplotu. Po X měření provede výpočet průměrné hodnoty a odešle událost `MeasuredTemperature`.
 
@@ -303,18 +291,6 @@ Měří teplotu a vlhkost okolního prostředí.
 
 ![HumidityMeter](images/devices/humiditymeter.png)
 ![HumidityMeter](images/devices/movementdetection.png)
-
-### Režim Momentary
-Jednou za X minut provede měření teploty a vlhkosti a odešle událost `MeasuredHumidityTemperature`.
-
-> MessageType: HumidityMeterMomentary
-
-| EventType                                   | Popis |
-|:--------------------------------------------|:------|
-| [Restart](#eventtype-restart)               | Restart zařízení. |
-| [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
-| [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
-| [MeasuredHumidityTemperature](#eventtype-measuredhumiditytemperature) | Naměřené veličiny. |
 
 ### Režim Average
 Každou minutu měří teplotu a vlhkost. Po X měření provede výpočet průměrné hodnoty a odešle událost `MeasuredHumidityTemperature`.
@@ -462,7 +438,7 @@ Ukázka zaslané události:
 ```
 
 ## EventType AlertEnd
-Situace kdy událost nastane je popsána u každého zařízení které tuto událost zasílá.
+Situace kdy událost nastane je popsána u každého zařízení, které tuto událost zasílá.
 
 Ukázka zaslané události:
 ```yaml
