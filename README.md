@@ -102,10 +102,10 @@ Detekuje přítomnost vody v ohraničeném prostoru.
 
 ![WaterDetection](images/devices/waterdetection.png)
 
-### Režim Simple
+### Režim Continuous
 Pokud v klidovém stavu dojde k zaplavení, je vyvolána událost `AlertStart`. Následně kontroluje každou minutu zda zaplavení trvá a pokud trvá, tak po 10 minutách vyvolá událost `AlertContinue`. Pokud i nadále zaplavení pokračuje pošle po dalších 10 minutách událost `AlertContinue`, že zaplavení pokračuje, další již neposílá. Po skončení zaplavení zařízení posílá `AlertEnd`.
 
-> MessageType: WaterDetectionSimple
+> MessageType: WaterDetectionContinuous
 
 | EventType                                   | Popis |
 |:--------------------------------------------|:------|
@@ -189,26 +189,6 @@ Pokud v klidovém stavu dojde k oddálení magnetu, je vyvolána událost `Alert
 Detekuje pohyb nebo přítomnost člověka ve vymezeném prostoru do vzdálenosti 10m. 
 
 ![Pir](images/devices/pir.png)
-
-### Režim Simple
-Pro detekci, že v místnosti nebo vymezeném prostoru došlo k pohybu. 
-
-Jakmile senzor detekuje pohyb pošle zprávu s událostí `AlertStart`. Pokud i nadále detekuje pohyb, pošle po 10 minutách zprávu s událostí `AlertContinue`, že pohyb pokračuje, kolik pohybů zaznamenal a kdy nastal poslední. Pokud i nadále detekuje pohyb pošle po dalších 10-ti minutách zprávu `AlertContinue`, že pohyb pokračuje a potom již zprávy o pokračování neposílá. Senzor pošle zprávu s událostí `AlertEnd`, že pohyb skončil pokud 10 minut nenastane žádný pohyb.
-
-> MessageType: PirSimple
-
-| EventType                                   | Popis |
-|:--------------------------------------------|:------|
-| [Restart](#eventtype-restart)               | Restart zařízení. |
-| [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
-| [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
-| [TamperOpen](#eventtype-tamperopen)         | Otevření krytu zařízení, rozepnutí bezpečnostního spínače. |
-| [TamperClosed](#eventtype-tamperclosed) *   | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
-| [AlertStart](#eventtype-alertstart)         | Detekce začátku pohybu. |
-| [AlertContinue](#eventtype-alertcontinue)   | Bohyb pokračuje. |
-| [AlertEnd](#eventtype-alertend)             | Během 10 minut nedošlo k pohybu. |
-
-\* TamperClosed aktuální verze senzorů nepodporuje
 
 ### Režim Continuous
 Pro identifikaci, že se v místnosti nebo ohraničeném prostoru pohybuje člověk, kdy a jak často. 
