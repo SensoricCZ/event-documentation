@@ -93,7 +93,11 @@ Společné parametry:
 | MessageType       | string  | typ zprávy                    |
 | EventType         | string  | typ události                  |
 
-Další parametry jsou závislé na typu zprávy a události.
+`EventTime` udává přibližný čas kdy událost nastala. Čas je přibližný je z důvodu nepřesnosti interních hodin senzoru a v případě že se jedná o událost doručenou s větším zpožděním způsobeným výpadkem konektivity (např. v řádech hodin), může být nepřesnost v řádu desítek vteřin.
+
+`DeviceId` aktuálně odpovídá sériovému číslu zařízení. V budoucnu může dojít ke změně.
+
+Další případné parametry neuvedené v tabulce jsou závislé na typu zprávy a události.
 
 # Zařízení a podporované události
 
@@ -153,15 +157,15 @@ Vždy při oddálení magnetu je vyvolána událost `AlertStart`. Při přiblí�
 
 > MessageType: MagneticDetectionSimple
 
-| EventType                                   | Popis |
-|:--------------------------------------------|:------|
-| [Restart](#eventtype-restart)               | Restart zařízení. |
-| [Alive](#eventtype-alive)                   | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
-| [Transport](#eventtype-transport)           | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
-| [TamperOpen](#eventtype-tamperopen)         | Otevření krytu zařízení, rozepnutí bezpečnostního spínače. |
-| [TamperClosed](#eventtype-tamperclosed) *   | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
-| [AlertStart](#eventtype-alertstart)         | Magnet oddálen, začátek poplachu. |
-| [AlertEnd](#eventtype-alertend)             | Magnet přiblížen zpět, konec poplachu. |
+| EventType                                         | Popis |
+|:--------------------------------------------------|:------|
+| [Restart](#eventtype-restart)                     | Restart zařízení. |
+| [Alive](#eventtype-alive)                         | Nastává v pravidelném intervalu, potvrzuje funkčnost zařízení. |
+| [Transport](#eventtype-transport)                 | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
+| [TamperOpen](#eventtype-tamperopen)               | Otevření krytu zařízení, rozepnutí bezpečnostního spínače. |
+| [TamperClosed](#eventtype-tamperclosed) *         | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
+| [AlertStart](#eventtype-alertstart)               | Magnet oddálen, začátek poplachu. |
+| [AlertEnd](#eventtype-alertend-pro-režimy-simple) | Magnet přiblížen zpět, konec poplachu. |
 
 \* TamperClosed aktuální verze senzorů nepodporuje
 
@@ -413,12 +417,43 @@ Ukázka zaslané události:
     "MessageType": "MagneticDetectionSimple",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "AlertContinue"
+    "EventType": "AlertContinue",
+    "AlertCount": 0,
+    "SecondsSinceLastAlert": 0
 }
 ```
 
+`AlertCount` udává počet opakování události od posledního odeslání `AlertStart` nebo `AlertContinue`.
+
+`SecondsSinceLastAlert` udává počet vteřin mezi podlední událostí a odesláním zprávy.
+
 ## EventType AlertEnd
 Situace kdy událost nastane je popsána u každého zařízení, které tuto událost zasílá.
+
+> MessageType u kterých může tato událost nastat: `WaterDetectionContinuous`, `MovementDetectionContinuous`, `MagneticDetectionContinuous`, `PirContinuous`
+
+Ukázka zaslané události:
+```yaml
+{
+    "ProtocolVersion": 1,
+    "DeviceId": "abc123",
+    "MessageType": "MagneticDetectionSimple",
+    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
+    "EventTime": "2021-05-03T14:25:31.8437511Z",
+    "EventType": "AlertEnd",
+    "AlertCount": 0,
+    "SecondsSinceLastAlert": 0
+}
+```
+
+`AlertCount` udává počet opakování události od posledního odeslání `AlertStart` nebo `AlertContinue`.
+
+`SecondsSinceLastAlert` udává počet vteřin mezi podlední událostí a odesláním zprávy.
+
+## EventType AlertEnd pro režimy simple
+Situace kdy událost nastane je popsána u každého zařízení, které tuto událost zasílá.
+
+> MessageType u kterých může tato událost nastat: `MagneticDetectionSimple`
 
 Ukázka zaslané události:
 ```yaml
