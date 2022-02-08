@@ -93,10 +93,6 @@ Společné parametry:
 | MessageType       | string  | typ zprávy                    |
 | EventType         | string  | typ události                  |
 
-`EventTime` udává přibližný čas kdy událost nastala. Čas je přibližný je z důvodu nepřesnosti interních hodin senzoru a v případě že se jedná o událost doručenou s větším zpožděním způsobeným výpadkem konektivity (např. v řádech hodin), může být nepřesnost v řádu desítek vteřin.
-
-`DeviceId` aktuálně odpovídá sériovému číslu zařízení. V budoucnu může dojít ke změně.
-
 Další případné parametry neuvedené v tabulce jsou závislé na typu zprávy a události.
 
 # Zařízení a podporované události
