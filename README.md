@@ -38,6 +38,7 @@ Dokument popisuje způsob předávání událostí ze systému SENSORIC do aplik
   - [EventType restart](#eventtype-restart)
   - [EventType alive](#eventtype-alive)
   - [EventType transport](#eventtype-transport)
+  - [EventType downlink-acknowledge](#eventtype-downlink-acknowledge)
   - [EventType tampe-open](#eventtype-tamper-open)
   - [EventType tamper-closed](#eventtype-tamperclosed)
   - [EventType alert-start](#eventtype-alertstart)
@@ -354,6 +355,21 @@ Ukázka zaslané události:
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
     "EventType": "transport"
+}
+```
+
+## EventType downlink-acknowledge
+Informuje o doručení downlinkového commandu na zařízení.
+
+Ukázka zaslané události:
+```yaml
+{
+    "ProtocolVersion": 1,
+    "DeviceId": "abc123",
+    "MessageType": "magnetic-detection-simple",
+    "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
+    "EventTime": "2021-05-03T14:25:31.8437511Z",
+    "EventType": "downlink-acknowledge"
 }
 ```
 
