@@ -1,58 +1,31 @@
 # Specifikace předávání událostí
+
 Dokument popisuje způsob předávání událostí ze systému SENSORIC do aplikace partnera.
 
-**Způsob komunikace je mezi SENSORIC a partnerem dohodnut a na straně SENSORIC nastaven.** V budoucnu bude umožněno partnerovi aby si sám nastavení měnil ve webovém rozhraní nebo přes API.
+**Způsob komunikace je mezi SENSORIC a partnerem dohodnut a na straně SENSORIC nastaven.** V budoucnu bude umožněno
+partnerovi aby si sám nastavení měnil ve webovém rozhraní nebo přes API.
 
 ## Obsah
-- [Specifikace předávání událostí](#specifikace-předávání-událostí)
-  - [Obsah](#obsah)
-- [Způsoby předávání dat](#způsoby-předávání-dat)
-  - [Předávání událostí přes HTTP callback](#předávání-událostí-přes-http-callback)
-    - [URL HTTP requestu](#url-http-requestu)
-    - [Hlavičky HTTP requestu](#hlavičky-http-requestu)
-    - [Odpověď na HTTP request](#odpověď-na-http-request)
-    - [Chování v případě nedoručení události](#chování-v-případě-nedoručení-události)
-- [Komunikační protokol](#komunikační-protokol)
-- [Zařízení a podporované události](#zařízení-a-podporované-události)
-  - [Zařízení WaterDetection](#zařízení-waterdetection)
-    - [Režim Simple](#režim-simple)
-  - [Zařízení MovementDetection](#zařízení-movementdetection)
-    - [Režim Continuous](#režim-continuous)
-  - [Zařízení Magnetic](#zařízení-magnetic)
-    - [Režim Simple](#režim-simple-1)
-    - [Režim Continuous](#režim-continuous-1)
-  - [Zařízení Pir](#zařízení-pir)
-    - [Režim Simple](#režim-simple-2)
-    - [Režim Continuous](#režim-continuous-2)
-  - [Zařízení AlertButton](#zařízení-alertbutton)
-    - [Režim Simple](#režim-simple-3)
-  - [Zařízení Thermometer](#zařízení-thermometer)
-    - [Režim Momentary](#režim-momentary)
-    - [Režim Average](#režim-average)
-    - [EventType measured-temperature](#eventtype-measured-temperature)
-  - [Zařízení HumidityMeter](#zařízení-humiditymeter)
-    - [Režim Momentary](#režim-momentary-1)
-    - [Režim Average](#režim-average-1)
-    - [EventType measured-humidity-temperature](#eventtype-measured-humidity-temperature)
-- [Společné události](#společné-události)
-  - [EventType restart](#eventtype-restart)
-  - [EventType alive](#eventtype-alive)
-  - [EventType transport](#eventtype-transport)
-  - [EventType downlink-acknowledge](#eventtype-downlink-acknowledge)
-  - [EventType tampe-open](#eventtype-tamper-open)
-  - [EventType tamper-closed](#eventtype-tamperclosed)
-  - [EventType alert-start](#eventtype-alertstart)
-  - [EventType alert-continue](#eventtype-alertcontinue)
-  - [EventType alert-end](#eventtype-alertend)
+
+Obsah můžete zobrazit následujícím způsobem:
+
+![Obsah](/images/table-of-contents.webp)
 
 # Způsoby předávání dat
-Data jsou předávána komunikačním protokolem ve formátu JSON a popisují události, které vznikají v systému SENSORIC. Položky datetime jsou v UTC podle ISO 8601. Pořadí parametrů není zaručeno a může se měnit.
+
+Data jsou předávána komunikačním protokolem ve formátu JSON a popisují události, které vznikají v systému SENSORIC.
+Položky datetime jsou v UTC podle ISO 8601. Pořadí parametrů není zaručeno a může se měnit.
 
 ## Předávání událostí přes HTTP callback
-Partner může specifikovat URL endpointů na které jsou události zasílány formou HTTP(S) POST requestů. Requesty mají kódování UTF-8 a Content-Type “application/json”. Systém se snaží předat události v režimu at-least-once, může tedy nastat situace že je událost doručena víckrát. Tuto situaci lze ošetři s využitím položky EventId, která obsahuje identifikátor události.
+
+Partner může specifikovat URL endpointů na které jsou události zasílány formou HTTP(S) POST requestů. Requesty mají
+kódování UTF-8 a Content-Type “application/json”. Systém se snaží předat události v režimu at-least-once, může tedy
+nastat situace že je událost doručena víckrát. Tuto situaci lze ošetři s využitím položky EventId, která obsahuje
+identifikátor události.
 
 ### URL HTTP requestu
-Do URL je možné vložit zástupné parametry, které budou nahrazeny odpovídající hodnotou. 
+
+Do URL je možné vložit zástupné parametry, které budou nahrazeny odpovídající hodnotou.
 
 | Parametr          | Popis                         |
 | :-----------------|:------------------------------|
@@ -85,6 +58,7 @@ Systém očekává v odpovědi HTTP status 200-299, kterým partner potvrdí př
 Data jsou odesílána vždy jako samostatné události. Události mají společnou část parametrů.
 
 Společné parametry:
+
 | Parametr          | Typ     | Popis                         |
 | :-----------------|:--------|:------------------------------|
 | ProtocolVersion   | integer | verze komunikačního protokolu |
@@ -115,7 +89,7 @@ Pokud v klidovém stavu dojde k zaplavení, je vyvolána událost `alert-start`.
 | [transport](#eventtype-transport)             | Přechod do transportního režimu - neaktivní stav s minimální spotřebou. |
 | [alert-start](#eventtype-alert-start)         | Detekce vzniku zaplavení. |
 | [alert-continue](#eventtype-alert-continue)   | Zaplavení pokračuje. |
-| [alert-end](#eventtype-alert-end)             | Konec zaplavení. |
+| [alert-continue-end](#eventtype-alert-continue-end)             | Konec zaplavení. |
 
 ## Zařízení MovementDetection
 Detekuje pohyb předmětu, na kterém je čidlo připevněno nebo položeno. 
@@ -138,7 +112,7 @@ Pokud v klidovém stavu dojde pohybu, je vyvolána událost `alert-start`. Pokud
 | [tamper-closed](#eventtype-tamper-closed) *   | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
 | [alert-start](#eventtype-alert-start)         | Detekce začátku pohybu. |
 | [alert-continue](#eventtype-alert-continue)   | Bohyb pokračuje. |
-| [alert-end](#eventtype-alert-end)             | Během 10 minut nedošlo k pohybu. |
+| [alert-continue-end](#eventtype-alert-continue-end)             | Během 10 minut nedošlo k pohybu. |
 
 \* tamper-closed aktuální verze senzorů nepodporuje
 
@@ -182,7 +156,7 @@ Pokud v klidovém stavu dojde k oddálení magnetu, je vyvolána událost `alert
 | [tamper-closed](#eventtype-tamper-closed) *   | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
 | [alert-start](#eventtype-alert-start)         | Magnet oddálen, začátek poplachu. |
 | [alert-continue](#eventtype-alert-continue)   | Dění na magnetu se opakuje, poplach pokračuje. |
-| [alert-end](#eventtype-alert-end)             | Během 10 minut nedošlo k oddálení magnetu, konec poplachu. |
+| [alert-continue-end](#eventtype-alert-continue-end)             | Během 10 minut nedošlo k oddálení magnetu, konec poplachu. |
 
 \* tamper-closed aktuální verze senzorů nepodporuje
 
@@ -207,7 +181,7 @@ Jakmile senzor detekuje pohyb pošle zprávu s událostí `alert-start`. Pokud i
 | [tamper-closed](#eventtype-tamper-closed) *   | Uzavření krytu zařízení, sepnutí bezpečnostního spínače. |
 | [alert-start](#eventtype-alert-start)         | Detekce začátku pohybu. |
 | [alert-continue](#eventtype-alert-continue)   | Bohyb pokračuje. |
-| [alert-end](#eventtype-alert-end)             | Během 10 minut nedošlo k pohybu. |
+| [alert-continue-end](#eventtype-alert-continue-end)             | Během 10 minut nedošlo k pohybu. |
 
 \* tamper-closed aktuální verze senzorů nepodporuje
 
@@ -439,7 +413,7 @@ Ukázka zaslané události:
 
 `SecondsSinceLastAlert` udává počet vteřin mezi podlední událostí a odesláním zprávy.
 
-## EventType alert-end
+## EventType alert-continue-end
 Situace kdy událost nastane je popsána u každého zařízení, které tuto událost zasílá.
 
 > MessageType u kterých může tato událost nastat: `water-detection-continuous`, `movement-detection-continuous`, `magnetic-detection-continuous`, `pir-continuous`
@@ -452,7 +426,7 @@ Ukázka zaslané události:
     "MessageType": "magnetic-detection-continuous",
     "EventId": "c4056fc4-d433-4d2c-bb7f-23a691fd3dac",
     "EventTime": "2021-05-03T14:25:31.8437511Z",
-    "EventType": "alert-end",
+    "EventType": "alert-continue-end",
     "AlertCount": 0,
     "SecondsSinceLastAlert": 0
 }
@@ -462,7 +436,7 @@ Ukázka zaslané události:
 
 `SecondsSinceLastAlert` udává počet vteřin mezi podlední událostí a odesláním zprávy.
 
-## EventType alert-end pro režimy simple
+## EventType alert-end
 Situace kdy událost nastane je popsána u každého zařízení, které tuto událost zasílá.
 
 > MessageType u kterých může tato událost nastat: `magnetic-detection-simple`
